@@ -1,0 +1,16 @@
+{
+  "Db": {
+    "DbIp": "127.0.0.1",
+    "DbPort": "5432",
+    "DbName": "database",
+    "DbUser": "user",
+    "DbPassword": "password"
+  },
+  "Listen": {
+    "HttpIp": "127.0.0.1",
+    "HttpPort": "8090"
+  },
+  "Template": {
+    "BaseTemplateName": "templates/base.html"
+  }
+}
