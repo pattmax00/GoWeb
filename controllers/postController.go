@@ -24,7 +24,12 @@ func (postController *PostController) Register(w http.ResponseWriter, r *http.Re
 		http.Redirect(w, r, "/register", http.StatusFound)
 	}
 
-	models.CreateUser(postController.App, username, password, createdAt, updatedAt)
+	_, err := models.CreateUser(postController.App, username, password, createdAt, updatedAt)
+	if err != nil {
+		log.Println("Error creating user")
+		log.Println(err)
+		return
+	}
 
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
