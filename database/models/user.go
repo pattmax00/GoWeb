@@ -110,7 +110,7 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 	}
 }
 
-// CreateSessionCookie creates a new session token and cookie and returns the token value
+// createSessionCookie creates a new session token and cookie and returns the token value
 func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (string, error) {
 	// Generate random 64 character string (alpha-numeric)
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
@@ -143,4 +143,56 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 	http.SetCookie(w, cookie)
 
 	return token, nil
+}
+
+// ValidateSessionCookie validates the session cookie and returns the username of the user if valid
+func ValidateSessionCookie(app *app.App, r *http.Request) (string, error) {
+	// Get cookie from request
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		log.Println("Error getting cookie from request")
+		log.Println(err)
+		return "", err
+	}
+
+	// Query row by token
+	var username string
+	err = app.Db.QueryRow("SELECT username FROM users WHERE auth_token = $1", cookie.Value).Scan(&username)
+	if err != nil {
+		log.Println("Error querying row by token")
+		log.Println(err)
+		return "", err
+	}
+
+	return username, nil
+}
+
+// LogoutUser deletes the session cookie and token from the database
+func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
+	// Get cookie from request
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		log.Println("Error getting cookie from request")
+		log.Println(err)
+		return
+	}
+
+	// Set token to empty string
+	sqlStatement := "UPDATE users SET auth_token = $1 WHERE auth_token = $2"
+	err = app.Db.QueryRow(sqlStatement, "", cookie.Value).Scan()
+	if err != nil {
+		log.Println("Error setting auth_token column in users table")
+		log.Println(err)
+		return
+	}
+
+	// Delete cookie
+	cookie = &http.Cookie{
+		Name:   "",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+
+	http.SetCookie(w, cookie)
 }
