@@ -7,12 +7,13 @@ import (
 	"database/sql"
 	"encoding/gob"
 	"encoding/hex"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -77,7 +78,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 }
 
 // AuthenticateUser validates the password for the specified user if it matches a session cookie is created and returned
-func AuthenticateUser(app *app.App, username string, password string) (string, error) {
+func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, password string) (string, error) {
 	var hashedPassword []byte
 
 	// Query row by username, scan password column
@@ -105,12 +106,12 @@ func AuthenticateUser(app *app.App, username string, password string) (string, e
 		log.Println(err)
 		return "", err
 	} else {
-		return createSessionCookie(app, username)
+		return createSessionCookie(app, w, username)
 	}
 }
 
 // CreateSessionCookie creates a new session token and cookie and returns the token value
-func createSessionCookie(app *app.App, username string) (string, error) {
+func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (string, error) {
 	// Generate random 64 character string (alpha-numeric)
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
 	_, err := rand.Read(buff)
