@@ -26,3 +26,11 @@ func (getController *GetController) ShowHome(w http.ResponseWriter, r *http.Requ
 func (getController *GetController) ShowRegister(w http.ResponseWriter, r *http.Request) {
 	templating.RenderTemplate(getController.App, w, "templates/pages/register.html", nil)
 }
+
+func (getController *GetController) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	templating.RenderTemplate(getController.App, w, "templates/pages/login.html", nil)
+}
+
+func (getController *GetController) Logout(w http.ResponseWriter, r *http.Request) {
+	templating.RenderTemplate(getController.App, w, "templates/pages/register.html", nil)
+}

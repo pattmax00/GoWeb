@@ -20,5 +20,7 @@ func GetRoutes(app *app.App) {
 
 	// Pages
 	http.HandleFunc("/", getController.ShowHome)
+	http.HandleFunc("/login", getController.ShowLogin)
 	http.HandleFunc("/register", getController.ShowRegister)
+	http.HandleFunc("/logout", getController.Logout)
 }
