@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"GoWeb/app"
+	"GoWeb/database/models"
 	"GoWeb/templating"
 	"net/http"
 )
@@ -32,5 +33,6 @@ func (getController *GetController) ShowLogin(w http.ResponseWriter, r *http.Req
 }
 
 func (getController *GetController) Logout(w http.ResponseWriter, r *http.Request) {
-	templating.RenderTemplate(getController.App, w, "templates/pages/register.html", nil)
+	models.LogoutUser(getController.App, w, r)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
