@@ -2,10 +2,8 @@ package models
 
 import (
 	"GoWeb/app"
-	"bytes"
 	"crypto/rand"
 	"database/sql"
-	"encoding/gob"
 	"encoding/hex"
 	"log"
 	"math"
@@ -89,18 +87,8 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 		return "", err
 	}
 
-	// Convert passed password to []byte
-	passwordBuffer := &bytes.Buffer{}
-	err = gob.NewEncoder(passwordBuffer).Encode(password)
-	if err != nil {
-		log.Println("Unable to convert passed password to []byte")
-		log.Println(err)
-		return "", err
-	}
-	passwordByteSlice := passwordBuffer.Bytes()
-
 	// Validate password
-	err = bcrypt.CompareHashAndPassword(hashedPassword, passwordByteSlice)
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil { // Failed to validate password, doesn't match
 		log.Println("Authentication error (incorrect password) for user:" + username)
 		log.Println(err)
