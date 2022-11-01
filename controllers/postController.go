@@ -18,11 +18,19 @@ func (postController *PostController) Login(w http.ResponseWriter, r *http.Reque
 	password := r.FormValue("password")
 
 	if username == "" || password == "" {
-		log.Println("Tried to create user with empty username or password")
-		http.Redirect(w, r, "/register", http.StatusFound)
+		log.Println("Tried to login user with empty username or password")
+		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 
-	http.Redirect(w, r, "/login", http.StatusFound)
+	_, err := models.AuthenticateUser(postController.App, w, username, password)
+	if err != nil {
+		log.Println("Error authenticating user")
+		log.Println(err)
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (postController *PostController) Register(w http.ResponseWriter, r *http.Request) {
