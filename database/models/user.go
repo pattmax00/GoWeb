@@ -113,7 +113,7 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 
 	// Store token in auth_token column of users table
 	sqlStatement := "UPDATE users SET auth_token = $1 WHERE username = $2"
-	err = app.Db.QueryRow(sqlStatement, token, username).Scan()
+	_, err = app.Db.Exec(sqlStatement, token, username)
 	if err != nil {
 		log.Println("Error setting auth_token column in users table")
 		log.Println(err)
@@ -167,7 +167,7 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 
 	// Set token to empty string
 	sqlStatement := "UPDATE users SET auth_token = $1 WHERE auth_token = $2"
-	err = app.Db.QueryRow(sqlStatement, "", cookie.Value).Scan()
+	_, err = app.Db.Exec(sqlStatement, "", cookie.Value)
 	if err != nil {
 		log.Println("Error setting auth_token column in users table")
 		log.Println(err)
