@@ -176,7 +176,7 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 
 	// Delete cookie
 	cookie = &http.Cookie{
-		Name:   "",
+		Name:   "session",
 		Value:  "",
 		Path:   "/",
 		MaxAge: -1,
