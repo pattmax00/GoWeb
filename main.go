@@ -18,7 +18,12 @@ func main() {
 	// Load config file to application
 	app.Config = config.LoadConfig()
 
-	// Set log file
+	// Create logs directory if it doesn't exist
+	if _, err := os.Stat("logs"); os.IsNotExist(err) {
+		os.Mkdir("logs", 0755)
+	}
+
+	// Create log file and set output
 	file, _ := os.Create("logs/log-" + time.Now().String() + ".log")
 	log.SetOutput(file)
 
