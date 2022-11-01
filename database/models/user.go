@@ -122,10 +122,12 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 
 	// Create session cookie, containing token
 	cookie := &http.Cookie{
-		Name:   "session",
-		Value:  token,
-		Path:   "/",
-		MaxAge: 86400,
+		Name:     "session",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   86400,
+		HttpOnly: true,
+		Secure:   true,
 	}
 
 	http.SetCookie(w, cookie)
