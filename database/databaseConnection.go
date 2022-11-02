@@ -4,8 +4,9 @@ import (
 	"GoWeb/app"
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
+
+	_ "github.com/lib/pq"
 )
 
 // ConnectDB returns a new database connection
