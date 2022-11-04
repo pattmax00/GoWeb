@@ -22,6 +22,26 @@ type User struct {
 	UpdatedAt string
 }
 
+// GetCurrentUser finds the currently logged in user by session cookie
+func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		log.Println("Error getting session cookie")
+		return User{}, err
+	}
+
+	var userId int64
+
+	// Query row by session cookie
+	err = app.Db.QueryRow("SELECT user_id FROM sessions WHERE session = $1", cookie.Value).Scan(&userId)
+	if err != nil {
+		log.Println("Error querying session row with session: " + cookie.Value)
+		return User{}, err
+	}
+
+	return GetUserById(app, userId)
+}
+
 // GetUserById finds a users table row in the database by id and returns a struct representing this row
 func GetUserById(app *app.App, id int64) (User, error) {
 	user := User{}
