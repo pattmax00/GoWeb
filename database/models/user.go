@@ -27,6 +27,7 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		log.Println("Error getting session cookie")
+		log.Println(err)
 		return User{}, err
 	}
 
