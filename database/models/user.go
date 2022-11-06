@@ -132,6 +132,21 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 	str := hex.EncodeToString(buff)
 	token := str[:64]
 
+	// Ensure no duplicate tokens exist in database
+	var count int
+	err = app.Db.QueryRow("SELECT COUNT(*) FROM sessions WHERE session = $1", token).Scan(&count)
+	if err != nil {
+		log.Println("Error querying sessions table for duplicate token")
+		log.Println(err)
+		return "", err
+	}
+
+	// If duplicate token found, recursively call function until unique token is generated
+	if count > 0 {
+		log.Println("Duplicate token found in sessions table")
+		return createSessionCookie(app, w, username)
+	}
+
 	// Store token in auth_token column of users table
 	sqlStatement := "UPDATE users SET auth_token = $1 WHERE username = $2"
 	_, err = app.Db.Exec(sqlStatement, token, username)
