@@ -6,7 +6,6 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"time"
 )
 
 // GenerateCsrfToken generates a csrf token and assigns it to a cookie for double submit cookie csrf protection
@@ -15,7 +14,7 @@ func GenerateCsrfToken(w http.ResponseWriter, r *http.Request) (string, error) {
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
 	_, err := rand.Read(buff)
 	if err != nil {
-		log.Println("Error creating random buffer for token value")
+		log.Println("Error creating random buffer for csrf token value")
 		log.Println(err)
 		return "", err
 	}
@@ -24,11 +23,10 @@ func GenerateCsrfToken(w http.ResponseWriter, r *http.Request) (string, error) {
 
 	// Create session cookie, containing token
 	cookie := &http.Cookie{
-		Name:     "csrf",
+		Name:     "csrf_token",
 		Value:    token,
 		Path:     "/",
 		MaxAge:   1800,
-		Expires:  time.Now().Add(24 * time.Hour),
 		HttpOnly: true,
 		Secure:   true,
 	}
@@ -41,15 +39,15 @@ func GenerateCsrfToken(w http.ResponseWriter, r *http.Request) (string, error) {
 // VerifyCsrfToken verifies the csrf token
 func VerifyCsrfToken(r *http.Request) (bool, error) {
 	// Get csrf cookie
-	cookie, err := r.Cookie("csrf")
+	cookie, err := r.Cookie("csrf_token")
 	if err != nil {
-		log.Println("Error getting csrf cookie")
+		log.Println("Error getting csrf_token cookie")
 		log.Println(err)
 		return false, err
 	}
 
 	// Get csrf token from form
-	token := r.FormValue("csrf")
+	token := r.FormValue("csrf_token")
 
 	// Compare csrf cookie and csrf token
 	if cookie.Value == token {
