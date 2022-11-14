@@ -125,7 +125,7 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
 	_, err := rand.Read(buff)
 	if err != nil {
-		log.Println("Error creating random buffer for token value")
+		log.Println("Error creating random buffer for session token value")
 		log.Println(err)
 		return "", err
 	}
