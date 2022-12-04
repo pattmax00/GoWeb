@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 func main() {
@@ -24,8 +23,8 @@ func main() {
 	}
 
 	// Create log file and set output
-	file, _ := os.Create("logs/log-" + time.Now().String() + ".log")
-	log.SetOutput(file)
+	//file, _ := os.Create("logs/log-" + time.Now().String() + ".log")
+	//log.SetOutput(file)
 
 	// Connect to database
 	app.Db = database.ConnectDB(&app)
