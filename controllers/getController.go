@@ -27,17 +27,17 @@ func (getController *GetController) ShowHome(w http.ResponseWriter, _ *http.Requ
 
 func (getController *GetController) ShowRegister(w http.ResponseWriter, r *http.Request) {
 	type dataStruct struct {
-		csrfToken string
+		CsrfToken string
 	}
 
 	// Create csrf token
-	csrfToken, err := security.GenerateCsrfToken(w, r)
+	CsrfToken, err := security.GenerateCsrfToken(w, r)
 	if err != nil {
 		return
 	}
 
 	data := dataStruct{
-		csrfToken: csrfToken,
+		CsrfToken: CsrfToken,
 	}
 
 	templating.RenderTemplate(getController.App, w, "templates/pages/register.html", data)
@@ -45,17 +45,17 @@ func (getController *GetController) ShowRegister(w http.ResponseWriter, r *http.
 
 func (getController *GetController) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	type dataStruct struct {
-		csrfToken string
+		CsrfToken string
 	}
 
 	// Create csrf token
-	csrfToken, err := security.GenerateCsrfToken(w, r)
+	CsrfToken, err := security.GenerateCsrfToken(w, r)
 	if err != nil {
 		return
 	}
 
 	data := dataStruct{
-		csrfToken: csrfToken,
+		CsrfToken: CsrfToken,
 	}
 
 	templating.RenderTemplate(getController.App, w, "templates/pages/login.html", data)

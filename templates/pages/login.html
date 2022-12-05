@@ -2,7 +2,7 @@
 
 {{ define "content" }}
 <form action="/login-handle" method="post">
-    <input name="csrf_token" type="hidden" value="{{ .csrfToken }}">
+    <input name="csrf_token" type="hidden" value="{{ .CsrfToken }}">
 
     <label for="username">Username:</label><br>
     <input id="username" name="username" type="text" value="John"><br><br>
