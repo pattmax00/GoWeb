@@ -2,8 +2,8 @@
 
 {{ define "content" }}
 <form action="/register-handle" method="post">
-    <input type="hidden" name="csrf_token" value="{{ .csrfToken }}">
-    
+    <input name="csrf_token" type="hidden" value="{{ .csrfToken }}">
+
     <label for="username">Username:</label><br>
     <input id="username" name="username" type="text" value="John"><br><br>
     <label for="password">Password:</label><br>
