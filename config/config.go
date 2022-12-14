@@ -35,7 +35,12 @@ func LoadConfig() Configuration {
 		log.Fatal("Unable to open config JSON file: ", err)
 	}
 
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatal("Unable to close config file: ", err)
+		}
+	}(file)
 
 	// Decode json config file to Configuration struct named config
 	decoder := json.NewDecoder(file)
