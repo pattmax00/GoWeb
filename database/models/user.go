@@ -22,7 +22,7 @@ type User struct {
 	UpdatedAt string
 }
 
-// GetCurrentUser finds the currently logged in user by session cookie
+// GetCurrentUser finds the currently logged-in user by session cookie
 func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
@@ -132,22 +132,22 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 	str := hex.EncodeToString(buff)
 	token := str[:64]
 
-	// Ensure no duplicate tokens exist in database
-	var count int
-	err = app.Db.QueryRow("SELECT COUNT(*) FROM sessions WHERE session = $1", token).Scan(&count)
+	// If the auth_token column for any user matches the token, set existingAuthToken to true
+	var existingAuthToken bool
+	err = app.Db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE auth_token = $1)", token).Scan(&existingAuthToken)
 	if err != nil {
-		log.Println("Error querying sessions table for duplicate token")
+		log.Println("Error checking for existing auth token")
 		log.Println(err)
 		return "", err
 	}
 
 	// If duplicate token found, recursively call function until unique token is generated
-	if count > 0 {
+	if existingAuthToken == true {
 		log.Println("Duplicate token found in sessions table")
 		return createSessionCookie(app, w, username)
 	}
 
-	// Store token in auth_token column of users table
+	// Store token in auth_token column of the users table
 	sqlStatement := "UPDATE users SET auth_token = $1 WHERE username = $2"
 	_, err = app.Db.Exec(sqlStatement, token, username)
 	if err != nil {
