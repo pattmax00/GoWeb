@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Create log file and set output
-	file, _ := os.Create("logs/log-" + time.Now().String() + ".log")
+	file, err := os.OpenFile("logs/"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	log.SetOutput(file)
 
 	// Connect to database
@@ -46,7 +46,7 @@ func main() {
 
 	// Start server
 	log.Println("Starting server and listening on " + appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port)
-	err := http.ListenAndServe(appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, nil)
+	err = http.ListenAndServe(appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, nil)
 	if err != nil {
 		log.Println(err)
 		return
