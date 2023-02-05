@@ -5,11 +5,15 @@ import (
 	"GoWeb/config"
 	"GoWeb/database"
 	"GoWeb/routes"
+	"embed"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
+
+//go:embed templates static
+var res embed.FS
 
 func main() {
 	// Create instance of App
@@ -17,6 +21,9 @@ func main() {
 
 	// Load config file to application
 	appLoaded.Config = config.LoadConfig()
+
+	// Load templates
+	appLoaded.Res = &res
 
 	// Create logs directory if it doesn't exist
 	if _, err := os.Stat("logs"); os.IsNotExist(err) {
