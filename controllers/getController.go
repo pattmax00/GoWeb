@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"GoWeb/app"
-	"GoWeb/database/models"
+	"GoWeb/models"
 	"GoWeb/security"
 	"GoWeb/templating"
 	"net/http"
