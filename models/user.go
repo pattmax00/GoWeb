@@ -148,8 +148,7 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 	}
 
 	// Store token in auth_token column of the users table
-	sqlStatement := "UPDATE users SET auth_token = $1 WHERE username = $2"
-	_, err = app.Db.Exec(sqlStatement, token, username)
+	_, err = app.Db.Exec("UPDATE users SET auth_token = $1 WHERE username = $2", token, username)
 	if err != nil {
 		log.Println("Error setting auth_token column in users table")
 		log.Println(err)
