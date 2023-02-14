@@ -4,7 +4,8 @@
     "DbPort": "5432",
     "DbName": "database",
     "DbUser": "user",
-    "DbPassword": "password"
+    "DbPassword": "password",
+    "AutoMigrate": "true"
   },
   "Listen": {
     "HttpIp": "127.0.0.1",
