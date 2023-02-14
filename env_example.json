@@ -5,7 +5,7 @@
     "DbName": "database",
     "DbUser": "user",
     "DbPassword": "password",
-    "AutoMigrate": "true"
+    "AutoMigrate": true
   },
   "Listen": {
     "HttpIp": "127.0.0.1",
