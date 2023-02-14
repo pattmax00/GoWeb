@@ -4,6 +4,7 @@ import (
 	"GoWeb/app"
 	"GoWeb/config"
 	"GoWeb/database"
+	"GoWeb/models"
 	"GoWeb/routes"
 	"embed"
 	"log"
@@ -37,8 +38,15 @@ func main() {
 	file, err := os.OpenFile("logs/"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	log.SetOutput(file)
 
-	// Connect to database
+	// Connect to database and run migrations
 	appLoaded.Db = database.ConnectDB(&appLoaded)
+	if appLoaded.Config.Db.AutoMigrate {
+		err = models.RunAllMigrations(&appLoaded)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 
 	// Define Routes
 	routes.GetRoutes(&appLoaded)
