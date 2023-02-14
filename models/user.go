@@ -18,6 +18,7 @@ type User struct {
 	Id        int64
 	Username  string
 	Password  string
+	AuthToken string
 	CreatedAt string
 	UpdatedAt string
 }
@@ -34,7 +35,7 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	var userId int64
 
 	// Query row by session cookie
-	err = app.Db.QueryRow("SELECT user_id FROM sessions WHERE session = $1", cookie.Value).Scan(&userId)
+	err = app.Db.QueryRow("SELECT Id FROM User WHERE session = $1", cookie.Value).Scan(&userId)
 	if err != nil {
 		log.Println("Error querying session row with session: " + cookie.Value)
 		return User{}, err
@@ -48,7 +49,7 @@ func GetUserById(app *app.App, id int64) (User, error) {
 	user := User{}
 
 	// Query row by id
-	row, err := app.Db.Query("SELECT id, username, password, created_at, updated_at FROM users WHERE id = $1", id)
+	row, err := app.Db.Query("SELECT Id, Username, Password, AuthToken, CreatedAt, UpdatedAt FROM User WHERE Id = $1", id)
 	if err != nil {
 		log.Println("Error querying user row with id: " + strconv.FormatInt(id, 10))
 		return User{}, err
@@ -85,7 +86,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 
 	var lastInsertId int64
 
-	sqlStatement := "INSERT INTO users (username, password, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id"
+	sqlStatement := "INSERT INTO User (Username, Password, CreatedAt, UpdatedAt) VALUES ($1, $2, $3, $4) RETURNING Id"
 	err = app.Db.QueryRow(sqlStatement, username, string(hash), createdAt, updatedAt).Scan(&lastInsertId)
 	if err != nil {
 		log.Println("Error creating user row")
@@ -101,7 +102,7 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 	var hashedPassword []byte
 
 	// Query row by username, scan password column
-	err := app.Db.QueryRow("SELECT password FROM users WHERE username = $1", username).Scan(&hashedPassword)
+	err := app.Db.QueryRow("SELECT Password FROM User WHERE Username = $1", username).Scan(&hashedPassword)
 	if err != nil {
 		log.Println("Unable to find row with username: " + username)
 		log.Println(err)
@@ -134,7 +135,7 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 
 	// If the auth_token column for any user matches the token, set existingAuthToken to true
 	var existingAuthToken bool
-	err = app.Db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE auth_token = $1)", token).Scan(&existingAuthToken)
+	err = app.Db.QueryRow("SELECT EXISTS(SELECT 1 FROM User WHERE AuthToken = $1)", token).Scan(&existingAuthToken)
 	if err != nil {
 		log.Println("Error checking for existing auth token")
 		log.Println(err)
@@ -148,7 +149,7 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, username string) (
 	}
 
 	// Store token in auth_token column of the users table
-	_, err = app.Db.Exec("UPDATE users SET auth_token = $1 WHERE username = $2", token, username)
+	_, err = app.Db.Exec("UPDATE User SET AuthToken = $1 WHERE Username = $2", token, username)
 	if err != nil {
 		log.Println("Error setting auth_token column in users table")
 		log.Println(err)
@@ -182,7 +183,7 @@ func ValidateSessionCookie(app *app.App, r *http.Request) (string, error) {
 
 	// Query row by token
 	var username string
-	err = app.Db.QueryRow("SELECT username FROM users WHERE auth_token = $1", cookie.Value).Scan(&username)
+	err = app.Db.QueryRow("SELECT Username FROM User WHERE AuthToken = $1", cookie.Value).Scan(&username)
 	if err != nil {
 		log.Println("Error querying row by token")
 		log.Println(err)
@@ -203,7 +204,7 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set token to empty string
-	sqlStatement := "UPDATE users SET auth_token = $1 WHERE auth_token = $2"
+	sqlStatement := "UPDATE User SET AuthToken = $1 WHERE AuthToken = $2"
 	_, err = app.Db.Exec(sqlStatement, "", cookie.Value)
 	if err != nil {
 		log.Println("Error setting auth_token column in users table")
