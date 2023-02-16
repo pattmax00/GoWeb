@@ -21,7 +21,6 @@ func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
 	str := hex.EncodeToString(buff)
 	token := str[:64]
 
-	// Create session cookie, containing token
 	cookie := &http.Cookie{
 		Name:     "csrf_token",
 		Value:    token,
@@ -38,7 +37,6 @@ func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
 
 // VerifyCsrfToken verifies the csrf token
 func VerifyCsrfToken(r *http.Request) (bool, error) {
-	// Get csrf cookie
 	cookie, err := r.Cookie("csrf_token")
 	if err != nil {
 		log.Println("Error getting csrf_token cookie")
@@ -46,10 +44,8 @@ func VerifyCsrfToken(r *http.Request) (bool, error) {
 		return false, err
 	}
 
-	// Get csrf token from form
 	token := r.FormValue("csrf_token")
 
-	// Compare csrf cookie and csrf token
 	if cookie.Value == token {
 		return true, nil
 	}
