@@ -97,8 +97,6 @@ func getPostgresType(goType string) (string, error) {
 		return "timestamp", nil
 	case "[]byte":
 		return "bytea", nil
-	default:
-		return "text", nil
 	}
 
 	return "", errors.New("Unknown type: " + goType)
