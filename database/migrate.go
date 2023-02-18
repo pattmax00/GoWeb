@@ -73,19 +73,11 @@ func createColumn(app *app.App, tableName, columnName, columnType string) error 
 // Given a type in Go, return the corresponding type in Postgres
 func getPostgresType(goType string) (string, error) {
 	switch goType {
-	case "int":
-	case "int32":
-	case "uint":
-	case "uint32":
+	case "int", "int32", "uint", "uint32":
 		return "integer", nil
-	case "int64":
-	case "uint64":
+	case "int64", "uint64":
 		return "bigint", nil
-	case "int16":
-	case "int8":
-	case "uint16":
-	case "uint8":
-	case "byte":
+	case "int16", "int8", "uint16", "uint8", "byte":
 		return "smallint", nil
 	case "string":
 		return "text", nil
