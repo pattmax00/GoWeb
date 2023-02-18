@@ -36,38 +36,64 @@ func Migrate(app *app.App, anyStruct interface{}) error {
 
 // createTable creates a table with the given name if it doesn't exist, it is assumed that id will be the primary key
 func createTable(app *app.App, tableName string) error {
-	sanitizedTableQuery := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (\"Id\" serial primary key)", tableName)
-
-	_, err := app.Db.Query(sanitizedTableQuery)
+	// Check to see if the table already exists
+	var tableExists bool
+	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relname ~ $1 AND pg_catalog.pg_table_is_visible(c.oid))", "^"+tableName+"$").Scan(&tableExists)
 	if err != nil {
-		log.Println("Error creating table: " + tableName)
+		log.Println("Error checking if table exists: " + tableName)
 		return err
 	}
 
-	log.Println("Table created successfully (or already exists): " + tableName)
-	return nil
+	if tableExists {
+		log.Println("Table already exists: " + tableName)
+		return nil
+	} else {
+		sanitizedTableQuery := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (\"Id\" serial primary key)", tableName)
+
+		_, err := app.Db.Query(sanitizedTableQuery)
+		if err != nil {
+			log.Println("Error creating table: " + tableName)
+			return err
+		}
+
+		log.Println("Table created successfully: " + tableName)
+		return nil
+	}
 }
 
 // createColumn creates a column with the given name and type if it doesn't exist
 func createColumn(app *app.App, tableName, columnName, columnType string) error {
-	postgresType, err := getPostgresType(columnType)
+	// Check to see if the column already exists
+	var columnExists bool
+	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = $2)", tableName, columnName).Scan(&columnExists)
 	if err != nil {
-		log.Println("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
+		log.Println("Error checking if column exists: " + columnName + " in table: " + tableName)
 		return err
 	}
 
-	sanitizedTableName := pq.QuoteIdentifier(tableName)
-	query := fmt.Sprintf("ALTER TABLE %s ADD COLUMN IF NOT EXISTS \"%s\" %s", sanitizedTableName, columnName, postgresType)
+	if columnExists {
+		log.Println("Column already exists: " + columnName + " in table: " + tableName)
+		return nil
+	} else {
+		postgresType, err := getPostgresType(columnType)
+		if err != nil {
+			log.Println("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
+			return err
+		}
 
-	_, err = app.Db.Query(query)
-	if err != nil {
-		log.Println("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
-		return err
+		sanitizedTableName := pq.QuoteIdentifier(tableName)
+		query := fmt.Sprintf("ALTER TABLE %s ADD COLUMN IF NOT EXISTS \"%s\" %s", sanitizedTableName, columnName, postgresType)
+
+		_, err = app.Db.Query(query)
+		if err != nil {
+			log.Println("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
+			return err
+		}
+
+		log.Println("Column created successfully:", columnName)
+
+		return nil
 	}
-
-	log.Println("Column created successfully (or already exists):", columnName)
-
-	return nil
 }
 
 // Given a type in Go, return the corresponding type in Postgres
