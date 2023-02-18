@@ -6,10 +6,13 @@ import (
 	"GoWeb/database"
 	"GoWeb/models"
 	"GoWeb/routes"
+	"context"
 	"embed"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -30,7 +33,9 @@ func main() {
 	if _, err := os.Stat("logs"); os.IsNotExist(err) {
 		err := os.Mkdir("logs", 0755)
 		if err != nil {
-			panic("Failed to create log directory")
+			log.Println("Failed to create log directory")
+			log.Println(err)
+			return
 		}
 	}
 
@@ -53,10 +58,23 @@ func main() {
 	routes.PostRoutes(&appLoaded)
 
 	// Start server
-	log.Println("Starting server and listening on " + appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port)
-	err = http.ListenAndServe(appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, nil)
+	server := &http.Server{Addr: appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port}
+	go func() {
+		log.Println("Starting server and listening on " + appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port)
+		err := server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Could not listen on %s: %v\n", appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, err)
+		}
+	}()
+
+	// Wait for interrupt signal and shut down the server
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+	<-interrupt
+	log.Println("Interrupt signal received. Shutting down server...")
+
+	err = server.Shutdown(context.Background())
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatalf("Could not gracefully shutdown the server: %v\n", err)
 	}
 }
