@@ -19,8 +19,8 @@ type User struct {
 	Username  string
 	Password  string
 	AuthToken string
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // GetCurrentUser finds the currently logged-in user by session cookie

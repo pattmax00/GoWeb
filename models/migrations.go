@@ -3,6 +3,7 @@ package models
 import (
 	"GoWeb/app"
 	"GoWeb/database"
+	"time"
 )
 
 // RunAllMigrations defines the structs that should be represented in the database
@@ -13,9 +14,13 @@ func RunAllMigrations(app *app.App) error {
 		Username:  "migrate",
 		Password:  "migrate",
 		AuthToken: "migrate",
-		CreatedAt: "2021-01-01 00:00:00",
-		UpdatedAt: "2021-01-01 00:00:00",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err := database.Migrate(app, user)
+	if err != nil {
+		return err
 	}
 
-	return database.Migrate(app, user)
+	return nil
 }
