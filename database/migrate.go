@@ -85,7 +85,7 @@ func getPostgresType(goType string) (string, error) {
 		return "double precision", nil
 	case "bool":
 		return "boolean", nil
-	case "time.Time":
+	case "Time":
 		return "timestamp", nil
 	case "[]byte":
 		return "bytea", nil
