@@ -2,7 +2,6 @@ package models
 
 import (
 	"GoWeb/app"
-	"database/sql"
 	"log"
 	"net/http"
 	"strconv"
@@ -24,13 +23,12 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		log.Println("Error getting session cookie")
-		log.Println(err)
 		return User{}, err
 	}
 
 	var userId int64
 
-	// Query row by session cookie
+	// Query row by AuthToken
 	err = app.Db.QueryRow("SELECT \"Id\" FROM public.\"Session\" WHERE \"AuthToken\" = $1", cookie.Value).Scan(&userId)
 	if err != nil {
 		log.Println("Error querying session row with session: " + cookie.Value)
@@ -45,19 +43,11 @@ func GetUserById(app *app.App, id int64) (User, error) {
 	user := User{}
 
 	// Query row by id
-	row, err := app.Db.Query("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Id\" = $1", id)
+	err := app.Db.QueryRow("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Id\" = $1", id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		log.Println("Error querying user row with id: " + strconv.FormatInt(id, 10))
+		log.Println("Get user error (user not found) for user id:" + strconv.FormatInt(id, 10))
 		return User{}, err
 	}
-
-	defer func(row *sql.Rows) {
-		err := row.Close()
-		if err != nil {
-			log.Println("Error closing database row")
-			log.Println(err)
-		}
-	}(row)
 
 	return user, nil
 }
@@ -67,19 +57,11 @@ func GetUserByUsername(app *app.App, username string) (User, error) {
 	user := User{}
 
 	// Query row by username
-	row, err := app.Db.Query("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Username\" = $1", username)
+	err := app.Db.QueryRow("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Username\" = $1", username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		log.Println("Error querying user row with username: " + username)
+		log.Println("Get user error (user not found) for user:" + username)
 		return User{}, err
 	}
-
-	defer func(row *sql.Rows) {
-		err := row.Close()
-		if err != nil {
-			log.Println("Error closing database row")
-			log.Println(err)
-		}
-	}(row)
 
 	return user, nil
 }
@@ -113,7 +95,6 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 	err := app.Db.QueryRow("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Username\" = $1", username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Authentication error (user not found) for user:" + username)
-		log.Println(err)
 		return Session{}, err
 	}
 
@@ -121,7 +102,6 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil { // Failed to validate password, doesn't match
 		log.Println("Authentication error (incorrect password) for user:" + username)
-		log.Println(err)
 		return Session{}, err
 	} else {
 		return CreateSession(app, w, user.Id)
@@ -134,7 +114,6 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		log.Println("Error getting cookie from request")
-		log.Println(err)
 		return
 	}
 
@@ -142,7 +121,6 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 	err = DeleteSessionByAuthToken(app, w, cookie.Value)
 	if err != nil {
 		log.Println("Error deleting session by auth token")
-		log.Println(err)
 		return
 	}
 
