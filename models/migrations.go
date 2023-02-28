@@ -13,11 +13,21 @@ func RunAllMigrations(app *app.App) error {
 		Id:        1, // Id is handled automatically, but it is added here to show it will be skipped during column creation
 		Username:  "migrate",
 		Password:  "migrate",
-		AuthToken: "migrate",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 	err := database.Migrate(app, user)
+	if err != nil {
+		return err
+	}
+
+	session := Session{
+		Id:        1,
+		UserId:    1,
+		AuthToken: "migrate",
+		CreatedAt: time.Now(),
+	}
+	err = database.Migrate(app, session)
 	if err != nil {
 		return err
 	}
