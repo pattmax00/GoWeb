@@ -3,7 +3,6 @@ package models
 import (
 	"GoWeb/app"
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -117,7 +116,6 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 		log.Println(err)
 		return Session{}, err
 	}
-	fmt.Println(user)
 
 	// Validate password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
