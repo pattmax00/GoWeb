@@ -16,6 +16,17 @@ type Session struct {
 	CreatedAt time.Time
 }
 
+const sessionColumnsNoId = "\"UserId\", \"AuthToken\", \"CreatedAt\""
+const sessionColumns = "\"Id\", " + sessionColumnsNoId
+const sessionTable = "public.\"Session\""
+
+const (
+	selectSessionByAuthToken = "SELECT " + sessionColumns + " FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
+	selectAuthTokenIfExists  = "SELECT EXISTS(SELECT 1 FROM " + sessionTable + " WHERE \"AuthToken\" = $1)"
+	insertSession            = "INSERT INTO " + sessionTable + " (" + sessionColumnsNoId + ") VALUES ($1, $2, $3) RETURNING \"Id\""
+	deleteSessionByAuthToken = "DELETE FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
+)
+
 // CreateSession creates a new session for a user
 func CreateSession(app *app.App, w http.ResponseWriter, userId int64) (Session, error) {
 	session := Session{}
@@ -25,7 +36,7 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64) (Session, 
 
 	// If the AuthToken column for any user matches the token, set existingAuthToken to true
 	var existingAuthToken bool
-	err := app.Db.QueryRow("SELECT EXISTS(SELECT 1 FROM public.\"Session\" WHERE \"AuthToken\" = $1)", session.AuthToken).Scan(&existingAuthToken)
+	err := app.Db.QueryRow(selectAuthTokenIfExists, session.AuthToken).Scan(&existingAuthToken)
 	if err != nil {
 		log.Println("Error checking for existing auth token")
 		log.Println(err)
@@ -39,7 +50,7 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64) (Session, 
 	}
 
 	// Insert session into database
-	err = app.Db.QueryRow("INSERT INTO public.\"Session\" (\"UserId\", \"AuthToken\", \"CreatedAt\") VALUES ($1, $2, $3) RETURNING \"Id\"", session.UserId, session.AuthToken, session.CreatedAt).Scan(&session.Id)
+	err = app.Db.QueryRow(insertSession, session.UserId, session.AuthToken, session.CreatedAt).Scan(&session.Id)
 	if err != nil {
 		log.Println("Error inserting session into database")
 		return Session{}, err
@@ -91,7 +102,7 @@ func deleteSessionCookie(app *app.App, w http.ResponseWriter) {
 // DeleteSessionByAuthToken deletes a session from the database by AuthToken
 func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken string) error {
 	// Delete session from database
-	_, err := app.Db.Exec("DELETE FROM public.\"Session\" WHERE \"AuthToken\" = $1", authToken)
+	_, err := app.Db.Exec(deleteSessionByAuthToken, authToken)
 	if err != nil {
 		log.Println("Error deleting session from database")
 		return err

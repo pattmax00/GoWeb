@@ -18,6 +18,17 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+const userColumnsNoId = "\"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\""
+const userColumns = "\"Id\", " + userColumnsNoId
+const userTable = "public.\"User\""
+
+const (
+	selectSessionIdByAuthToken = "SELECT \"Id\" FROM public.\"Session\" WHERE \"AuthToken\" = $1"
+	selectUserById             = "SELECT " + userColumns + " FROM " + userTable + " WHERE \"Id\" = $1"
+	selectUserByUsername       = "SELECT " + userColumns + " FROM " + userTable + " WHERE \"Username\" = $1"
+	insertUser                 = "INSERT INTO " + userTable + " (" + userColumnsNoId + ") VALUES ($1, $2, $3, $4) RETURNING \"Id\""
+)
+
 // GetCurrentUser finds the currently logged-in user by session cookie
 func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
@@ -29,7 +40,7 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	var userId int64
 
 	// Query row by AuthToken
-	err = app.Db.QueryRow("SELECT \"Id\" FROM public.\"Session\" WHERE \"AuthToken\" = $1", cookie.Value).Scan(&userId)
+	err = app.Db.QueryRow(selectSessionIdByAuthToken, cookie.Value).Scan(&userId)
 	if err != nil {
 		log.Println("Error querying session row with session: " + cookie.Value)
 		return User{}, err
@@ -38,12 +49,12 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	return GetUserById(app, userId)
 }
 
-// GetUserById finds a users table row in the database by id and returns a struct representing this row
+// GetUserById finds a User table row in the database by id and returns a struct representing this row
 func GetUserById(app *app.App, id int64) (User, error) {
 	user := User{}
 
 	// Query row by id
-	err := app.Db.QueryRow("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Id\" = $1", id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	err := app.Db.QueryRow(selectUserById, id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Get user error (user not found) for user id:" + strconv.FormatInt(id, 10))
 		return User{}, err
@@ -52,12 +63,12 @@ func GetUserById(app *app.App, id int64) (User, error) {
 	return user, nil
 }
 
-// GetUserByUsername finds a users table row in the database by username and returns a struct representing this row
+// GetUserByUsername finds a User table row in the database by username and returns a struct representing this row
 func GetUserByUsername(app *app.App, username string) (User, error) {
 	user := User{}
 
 	// Query row by username
-	err := app.Db.QueryRow("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Username\" = $1", username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Get user error (user not found) for user:" + username)
 		return User{}, err
@@ -66,7 +77,7 @@ func GetUserByUsername(app *app.App, username string) (User, error) {
 	return user, nil
 }
 
-// CreateUser creates a users table row in the database
+// CreateUser creates a User table row in the database
 func CreateUser(app *app.App, username string, password string, createdAt time.Time, updatedAt time.Time) (User, error) {
 	// Hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -77,8 +88,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 
 	var lastInsertId int64
 
-	sqlStatement := "INSERT INTO public.\"User\" (\"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\") VALUES ($1, $2, $3, $4) RETURNING \"Id\""
-	err = app.Db.QueryRow(sqlStatement, username, string(hash), createdAt, updatedAt).Scan(&lastInsertId)
+	err = app.Db.QueryRow(insertUser, username, string(hash), createdAt, updatedAt).Scan(&lastInsertId)
 	if err != nil {
 		log.Println("Error creating user row")
 		return User{}, err
@@ -92,7 +102,7 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 	var user User
 
 	// Query row by username
-	err := app.Db.QueryRow("SELECT \"Id\", \"Username\", \"Password\", \"CreatedAt\", \"UpdatedAt\" FROM public.\"User\" WHERE \"Username\" = $1", username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Authentication error (user not found) for user:" + username)
 		return Session{}, err
@@ -108,7 +118,7 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 	}
 }
 
-// LogoutUser deletes the session cookie and token from the database
+// LogoutUser deletes the session cookie and AuthToken from the database
 func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 	// Get cookie from request
 	cookie, err := r.Cookie("session")
@@ -120,7 +130,7 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 	// Set token to empty string
 	err = DeleteSessionByAuthToken(app, w, cookie.Value)
 	if err != nil {
-		log.Println("Error deleting session by auth token")
+		log.Println("Error deleting session by AuthToken")
 		return
 	}
 
