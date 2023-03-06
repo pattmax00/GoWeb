@@ -41,6 +41,8 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 4. Run `go run main.go` to start the server
 5. Start building your app!
 
+<hr>
+
 ### License and disclaimer
 
 - You are free to use this project under the terms of the MIT license. See LICENSE for more details.
