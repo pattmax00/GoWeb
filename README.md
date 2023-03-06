@@ -41,6 +41,13 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 4. Run `go run main.go` to start the server
 5. Start building your app!
 
+## How to contribute
+
+- Open an issue on Github if you find a bug or have a feature request.
+- [Email](mailto:contact@mpatterson.xyz) me a patch if you want to contribute code.
+    - Please include a good description of what the patch does and why it is needed, also include how you want to be
+      credited in the commit message.
+
 <hr>
 
 ### License and disclaimer
