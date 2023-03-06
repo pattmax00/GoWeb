@@ -1,13 +1,16 @@
 {{ define "pageTitle" }}Register{{ end }}
 
 {{ define "content" }}
-<form action="/register-handle" method="post">
-    <input name="csrf_token" type="hidden" value="{{ .CsrfToken }}">
+<h1>Register</h1>
+<div class="container">
+    <form action="/register-handle" method="post">
+        <input name="csrf_token" type="hidden" value="{{ .CsrfToken }}">
 
-    <label for="username">Username:</label><br>
-    <input id="username" name="username" type="text" value="John"><br><br>
-    <label for="password">Password:</label><br>
-    <input id="password" name="password" type="password"><br><br>
-    <input type="submit" value="Submit">
-</form>
+        <label for="username">Username:</label><br>
+        <input id="username" name="username" type="text" value="John"><br><br>
+        <label for="password">Password:</label><br>
+        <input id="password" name="password" type="password"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
 {{ end }}

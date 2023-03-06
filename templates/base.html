@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>SiteName - {{ template "pageTitle" }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 {{ template "content" . }}
+<div class="footer-container">
+    <footer>
+        <p>SiteName - Powered by GoWeb!</p>
+    </footer>
+</div>
 </body>
-<footer>
-    <p>SiteName - Powered by Go!</p>
-</footer>
 </html>
