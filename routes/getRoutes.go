@@ -3,6 +3,7 @@ package routes
 import (
 	"GoWeb/app"
 	"GoWeb/controllers"
+	"io/fs"
 	"log"
 	"net/http"
 )
@@ -15,8 +16,14 @@ func GetRoutes(app *app.App) {
 	}
 
 	// Serve static files
-	http.Handle("/file/", http.FileServer(http.Dir("./static")))
-	log.Println("Serving static files from: ./static")
+	staticFS, err := fs.Sub(app.Res, "static")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	staticHandler := http.FileServer(http.FS(staticFS))
+	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
+	log.Println("Serving static files from embedded FS")
 
 	// Pages
 	http.HandleFunc("/", getController.ShowHome)
