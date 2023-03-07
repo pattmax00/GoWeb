@@ -23,7 +23,7 @@ func GetRoutes(app *app.App) {
 	}
 	staticHandler := http.FileServer(http.FS(staticFS))
 	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
-	log.Println("Serving static files from embedded FS")
+	log.Println("Serving static files from embedded file system /static")
 
 	// Pages
 	http.HandleFunc("/", getController.ShowHome)
