@@ -133,6 +133,4 @@ func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 		log.Println("Error deleting session by AuthToken")
 		return
 	}
-
-	http.SetCookie(w, cookie)
 }
