@@ -53,6 +53,12 @@ func main() {
 		}
 	}
 
+	// Assign and run scheduled tasks
+	appLoaded.ScheduledTasks = app.Scheduled{
+		EveryReboot: []func(app *app.App){models.ScheduledSessionCleanup},
+		EveryMinute: []func(app *app.App){models.ScheduledSessionCleanup},
+	}
+
 	// Define Routes
 	routes.GetRoutes(&appLoaded)
 	routes.PostRoutes(&appLoaded)
@@ -70,6 +76,8 @@ func main() {
 	// Wait for interrupt signal and shut down the server
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+	stop := make(chan struct{})
+	go app.RunScheduledTasks(&appLoaded, 100, stop)
 	<-interrupt
 	log.Println("Interrupt signal received. Shutting down server...")
 

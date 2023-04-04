@@ -21,10 +21,11 @@ const sessionColumns = "\"Id\", " + sessionColumnsNoId
 const sessionTable = "public.\"Session\""
 
 const (
-	selectSessionByAuthToken = "SELECT " + sessionColumns + " FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
-	selectAuthTokenIfExists  = "SELECT EXISTS(SELECT 1 FROM " + sessionTable + " WHERE \"AuthToken\" = $1)"
-	insertSession            = "INSERT INTO " + sessionTable + " (" + sessionColumnsNoId + ") VALUES ($1, $2, $3) RETURNING \"Id\""
-	deleteSessionByAuthToken = "DELETE FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
+	selectSessionByAuthToken      = "SELECT " + sessionColumns + " FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
+	selectAuthTokenIfExists       = "SELECT EXISTS(SELECT 1 FROM " + sessionTable + " WHERE \"AuthToken\" = $1)"
+	insertSession                 = "INSERT INTO " + sessionTable + " (" + sessionColumnsNoId + ") VALUES ($1, $2, $3) RETURNING \"Id\""
+	deleteSessionByAuthToken      = "DELETE FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
+	deleteSessionsOlderThan30Days = "DELETE FROM " + sessionTable + " WHERE \"CreatedAt\" < NOW() - INTERVAL '30 days'"
 )
 
 // CreateSession creates a new session for a user
@@ -111,4 +112,16 @@ func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken str
 	deleteSessionCookie(app, w)
 
 	return nil
+}
+
+// ScheduledSessionCleanup deletes expired sessions from the database
+func ScheduledSessionCleanup(app *app.App) {
+	// Delete sessions older than 30 days
+	_, err := app.Db.Exec(deleteSessionsOlderThan30Days)
+	if err != nil {
+		log.Println("Error deleting expired sessions from database")
+		log.Println(err)
+	}
+
+	log.Println("Deleted expired sessions from database")
 }
