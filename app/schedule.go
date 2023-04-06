@@ -1,6 +1,9 @@
 package app
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Scheduled struct {
 	EveryReboot []func(app *App)
@@ -35,11 +38,14 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 	}
 
 	// Set up task runners
+	var wg sync.WaitGroup
 	runners := make([]chan bool, len(tasks))
 	for i, task := range tasks {
 		runner := make(chan bool, poolSize)
 		runners[i] = runner
+		wg.Add(1)
 		go func(task Task, runner chan bool) {
+			defer wg.Done()
 			ticker := time.NewTicker(task.Interval)
 			defer ticker.Stop()
 			for {
@@ -59,11 +65,11 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 		}(task, runner)
 	}
 
-	// Wait for termination
+	// Wait for all goroutines to finish
+	wg.Wait()
+
+	// Close channels
 	for _, runner := range runners {
-		for i := 0; i < cap(runner); i++ {
-			runner <- false
-		}
 		close(runner)
 	}
 }
