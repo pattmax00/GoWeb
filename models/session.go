@@ -139,7 +139,7 @@ func ScheduledSessionCleanup(app *app.App) {
 	}
 
 	// Delete sessions older than 6 hours
-	_, err = app.Db.Exec(deleteSessionsOlderThan30Days)
+	_, err = app.Db.Exec(deleteSessionsOlderThan6Hours)
 	if err != nil {
 		log.Println("Error deleting 6 hour expired sessions from database")
 		log.Println(err)
