@@ -78,6 +78,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	stop := make(chan struct{})
 	go app.RunScheduledTasks(&appLoaded, 100, stop)
+
 	<-interrupt
 	log.Println("Interrupt signal received. Shutting down server...")
 
