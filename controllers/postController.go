@@ -24,13 +24,14 @@ func (postController *PostController) Login(w http.ResponseWriter, r *http.Reque
 
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	remember := r.FormValue("remember") == "on"
 
 	if username == "" || password == "" {
 		log.Println("Tried to login user with empty username or password")
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 
-	_, err = models.AuthenticateUser(postController.App, w, username, password)
+	_, err = models.AuthenticateUser(postController.App, w, username, password, remember)
 	if err != nil {
 		log.Println("Error authenticating user")
 		log.Println(err)

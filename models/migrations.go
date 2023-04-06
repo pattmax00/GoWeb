@@ -22,10 +22,11 @@ func RunAllMigrations(app *app.App) error {
 	}
 
 	session := Session{
-		Id:        1,
-		UserId:    1,
-		AuthToken: "migrate",
-		CreatedAt: time.Now(),
+		Id:         1,
+		UserId:     1,
+		AuthToken:  "migrate",
+		RememberMe: false,
+		CreatedAt:  time.Now(),
 	}
 	err = database.Migrate(app, session)
 	if err != nil {

@@ -98,7 +98,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 }
 
 // AuthenticateUser validates the password for the specified user
-func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, password string) (Session, error) {
+func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, password string, remember bool) (Session, error) {
 	var user User
 
 	// Query row by username
@@ -114,7 +114,7 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 		log.Println("Authentication error (incorrect password) for user:" + username)
 		return Session{}, err
 	} else {
-		return CreateSession(app, w, user.Id)
+		return CreateSession(app, w, user.Id, remember)
 	}
 }
 

@@ -10,10 +10,11 @@ import (
 )
 
 type Session struct {
-	Id        int64
-	UserId    int64
-	AuthToken string
-	CreatedAt time.Time
+	Id         int64
+	UserId     int64
+	AuthToken  string
+	RememberMe bool
+	CreatedAt  time.Time
 }
 
 const sessionColumnsNoId = "\"UserId\", \"AuthToken\", \"CreatedAt\""
@@ -26,13 +27,15 @@ const (
 	insertSession                 = "INSERT INTO " + sessionTable + " (" + sessionColumnsNoId + ") VALUES ($1, $2, $3) RETURNING \"Id\""
 	deleteSessionByAuthToken      = "DELETE FROM " + sessionTable + " WHERE \"AuthToken\" = $1"
 	deleteSessionsOlderThan30Days = "DELETE FROM " + sessionTable + " WHERE \"CreatedAt\" < NOW() - INTERVAL '30 days'"
+	deleteSessionsOlderThan6Hours = "DELETE FROM " + sessionTable + " WHERE \"CreatedAt\" < NOW() - INTERVAL '6 hours' AND \"RememberMe\" = false"
 )
 
 // CreateSession creates a new session for a user
-func CreateSession(app *app.App, w http.ResponseWriter, userId int64) (Session, error) {
+func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember bool) (Session, error) {
 	session := Session{}
 	session.UserId = userId
 	session.AuthToken = generateAuthToken(app)
+	session.RememberMe = remember
 	session.CreatedAt = time.Now()
 
 	// If the AuthToken column for any user matches the token, set existingAuthToken to true
@@ -47,11 +50,11 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64) (Session, 
 	// If duplicate token found, recursively call function until unique token is generated
 	if existingAuthToken == true {
 		log.Println("Duplicate token found in sessions table, generating new token...")
-		return CreateSession(app, w, userId)
+		return CreateSession(app, w, userId, remember)
 	}
 
 	// Insert session into database
-	err = app.Db.QueryRow(insertSession, session.UserId, session.AuthToken, session.CreatedAt).Scan(&session.Id)
+	err = app.Db.QueryRow(insertSession, session.UserId, session.AuthToken, session.RememberMe, session.CreatedAt).Scan(&session.Id)
 	if err != nil {
 		log.Println("Error inserting session into database")
 		return Session{}, err
@@ -76,13 +79,25 @@ func generateAuthToken(app *app.App) string {
 
 // createSessionCookie creates a new session cookie
 func createSessionCookie(app *app.App, w http.ResponseWriter, session Session) {
-	cookie := &http.Cookie{
-		Name:     "session",
-		Value:    session.AuthToken,
-		Path:     "/",
-		MaxAge:   86400,
-		HttpOnly: true,
-		Secure:   true,
+	cookie := &http.Cookie{}
+	if session.RememberMe {
+		cookie = &http.Cookie{
+			Name:     "session",
+			Value:    session.AuthToken,
+			Path:     "/",
+			MaxAge:   2592000 * 1000, // 30 days in ms
+			HttpOnly: true,
+			Secure:   true,
+		}
+	} else {
+		cookie = &http.Cookie{
+			Name:     "session",
+			Value:    session.AuthToken,
+			Path:     "/",
+			MaxAge:   21600 * 1000, // 6 hours in ms
+			HttpOnly: true,
+			Secure:   true,
+		}
 	}
 
 	http.SetCookie(w, cookie)
@@ -116,10 +131,17 @@ func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken str
 
 // ScheduledSessionCleanup deletes expired sessions from the database
 func ScheduledSessionCleanup(app *app.App) {
-	// Delete sessions older than 30 days
+	// Delete sessions older than 30 days (remember me sessions)
 	_, err := app.Db.Exec(deleteSessionsOlderThan30Days)
 	if err != nil {
-		log.Println("Error deleting expired sessions from database")
+		log.Println("Error deleting 30 day expired sessions from database")
+		log.Println(err)
+	}
+
+	// Delete sessions older than 6 hours
+	_, err = app.Db.Exec(deleteSessionsOlderThan30Days)
+	if err != nil {
+		log.Println("Error deleting 6 hour expired sessions from database")
 		log.Println(err)
 	}
 
