@@ -15,6 +15,7 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 - CSRF protection
 - Minimal user login/registration + sessions
 - Config file handling
+- Scheduled tasks
 - Entire website compiles into a single binary (~10mb) (excluding env.json)
 - Minimal dependencies (just standard library, postgres driver, and experimental package for bcrypt)
 
