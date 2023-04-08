@@ -37,16 +37,13 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 		return User{}, err
 	}
 
-	var userId int64
-
-	// Query row by AuthToken
-	err = app.Db.QueryRow(selectSessionIdByAuthToken, cookie.Value).Scan(&userId)
+	session, err := GetSessionByAuthToken(app, cookie.Value)
 	if err != nil {
-		log.Println("Error querying session row with session: " + cookie.Value)
+		log.Println("Error getting session by auth token")
 		return User{}, err
 	}
 
-	return GetUserById(app, userId)
+	return GetUserById(app, session.UserId)
 }
 
 // GetUserById finds a User table row in the database by id and returns a struct representing this row

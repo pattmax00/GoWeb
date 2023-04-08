@@ -64,6 +64,18 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 	return session, nil
 }
 
+func GetSessionByAuthToken(app *app.App, authToken string) (Session, error) {
+	session := Session{}
+
+	err := app.Db.QueryRow(selectSessionByAuthToken, authToken).Scan(&session.Id, &session.UserId, &session.AuthToken, &session.RememberMe, &session.CreatedAt)
+	if err != nil {
+		log.Println("Error getting session by auth token")
+		return Session{}, err
+	}
+
+	return session, nil
+}
+
 // Generates a random 64-byte string
 func generateAuthToken(app *app.App) string {
 	// Generate random bytes
