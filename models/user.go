@@ -23,10 +23,9 @@ const userColumns = "\"Id\", " + userColumnsNoId
 const userTable = "public.\"User\""
 
 const (
-	selectSessionIdByAuthToken = "SELECT \"Id\" FROM public.\"Session\" WHERE \"AuthToken\" = $1"
-	selectUserById             = "SELECT " + userColumns + " FROM " + userTable + " WHERE \"Id\" = $1"
-	selectUserByUsername       = "SELECT " + userColumns + " FROM " + userTable + " WHERE \"Username\" = $1"
-	insertUser                 = "INSERT INTO " + userTable + " (" + userColumnsNoId + ") VALUES ($1, $2, $3, $4) RETURNING \"Id\""
+	selectUserById       = "SELECT " + userColumns + " FROM " + userTable + " WHERE \"Id\" = $1"
+	selectUserByUsername = "SELECT " + userColumns + " FROM " + userTable + " WHERE \"Username\" = $1"
+	insertUser           = "INSERT INTO " + userTable + " (" + userColumnsNoId + ") VALUES ($1, $2, $3, $4) RETURNING \"Id\""
 )
 
 // GetCurrentUser finds the currently logged-in user by session cookie
