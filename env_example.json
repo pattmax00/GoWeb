@@ -16,6 +16,6 @@
   },
   "Upload": {
       "UploadDirectoryName": "static/user-files/",
-      "MaxUploadSize": 1048576
+      "MaxUploadSize": 10485760
   }
 }
