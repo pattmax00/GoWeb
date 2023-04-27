@@ -25,6 +25,11 @@ type Configuration struct {
 	Template struct {
 		BaseName string `json:"BaseTemplateName"`
 	}
+
+	Upload struct {
+	    BaseName string `json:"UploadDirectoryName"`
+	    MaxSize int64 `json:"MaxUploadSize"`
+	}
 }
 
 // LoadConfig loads and returns a configuration struct

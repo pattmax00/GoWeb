@@ -1,5 +1,16 @@
 {{ define "pageTitle" }}Home{{ end }}
 
+{{ define "file-upload" }}
+<form
+   enctype="multipart/form-data"
+   action="/upload-handle"
+   method="post"
+>
+    <input type="file" accept="*/*" name="file" />
+    <input type="submit" value="upload" />
+</form>
+{{ end }}
+
 {{ define "content" }}
-{{ .Test }}
+{{ template "file-upload" . }}
 {{ end }}

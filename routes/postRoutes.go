@@ -16,4 +16,5 @@ func PostRoutes(app *app.App) {
 	// User authentication
 	http.HandleFunc("/register-handle", postController.Register)
 	http.HandleFunc("/login-handle", postController.Login)
+	http.HandleFunc("/upload-handle", postController.FileUpload)
 }
