@@ -8,6 +8,7 @@ import (
 	"strings"
 	"net/http"
 	"time"
+	"os"
 	"io/ioutil"
 )
 
@@ -98,9 +99,8 @@ func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.
     split := strings.Split(handler.Filename, ".")
     extension := split[len(split) - 1]
 
-    // Create a temporary file within static/user-images directory that follows
-    // a particular naming pattern
-    tempFile, err := ioutil.TempFile(postController.App.Config.Upload.BaseName, "upload-*." + extension)
+    // Create a temporary file within upload directory
+    tempFile, err := os.CreateTemp(postController.App.Config.Upload.BaseName, "*." + extension)
     if err != nil {
         log.Println(err)
 	http.Redirect(w, r, "/", http.StatusNotAcceptable)

@@ -15,7 +15,7 @@
     "BaseTemplateName": "templates/base.html"
   },
   "Upload": {
-      "UploadDirectoryName": "static/user-files/",
+      "UploadDirectoryName": "dynamic/user-uploads/",
       "MaxUploadSize": 10485760
   }
 }

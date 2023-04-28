@@ -30,4 +30,7 @@ func GetRoutes(app *app.App) {
 	http.HandleFunc("/login", getController.ShowLogin)
 	http.HandleFunc("/register", getController.ShowRegister)
 	http.HandleFunc("/logout", getController.Logout)
+
+	// Files
+	http.HandleFunc("/uploads", getController.ShowFile)
 }
