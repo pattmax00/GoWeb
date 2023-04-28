@@ -73,9 +73,10 @@ func (postController *PostController) Register(w http.ResponseWriter, r *http.Re
 }
 
 func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.Request) {
-    // Parse our multipart form, 10 << 20 specifies a maximum
-    // upload of 10 MB files.
-    r.ParseMultipartForm(10 << 20)
+
+    max := postController.App.Config.Upload.MaxSize
+    r.ParseMultipartForm(max)
+
     // FormFile returns the first file for the given key `file`
     // it also returns the FileHeader so we can get the Filename,
     // the Header and the size of the file
@@ -87,7 +88,6 @@ func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.
     }
     defer file.Close()
 
-    max := postController.App.Config.Upload.MaxSize
     if(handler.Size > max){
 	log.Println("User tried uploading a file which is too large.")
 	http.Redirect(w, r, "/", http.StatusRequestHeaderFieldsTooLarge)
