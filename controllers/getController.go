@@ -62,8 +62,8 @@ func (getController *GetController) ShowLogin(w http.ResponseWriter, r *http.Req
 }
 
 func (getController *GetController) ShowFile(w http.ResponseWriter, r *http.Request) {
-	// GET /uploads?name=4359873.jpg
-	// will serve 4359873.jpg
+	// GET /uploads?name=file.jpg
+	// will serve file.jpg
 	name := r.URL.Query().Get("name")
 	http.ServeFile(w, r, getController.App.Config.Upload.BaseName + name)
 }

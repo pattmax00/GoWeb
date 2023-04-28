@@ -5,7 +5,6 @@ import (
 	"GoWeb/models"
 	"GoWeb/security"
 	"log"
-	"strings"
 	"net/http"
 	"time"
 	"os"
@@ -95,12 +94,8 @@ func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.
 	return
     }
 
-    // get file extension
-    split := strings.Split(handler.Filename, ".")
-    extension := split[len(split) - 1]
-
     // Create a temporary file within upload directory
-    tempFile, err := os.CreateTemp(postController.App.Config.Upload.BaseName, "*." + extension)
+    tempFile, err := os.Create(postController.App.Config.Upload.BaseName + handler.Filename)
     if err != nil {
         log.Println(err)
 	http.Redirect(w, r, "/", http.StatusNotAcceptable)
