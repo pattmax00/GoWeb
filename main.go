@@ -47,7 +47,7 @@ func main() {
 	// Create upload directory if it doesn't exist
 	uploadPath := appLoaded.Config.Upload.BaseName
 	if _, err := os.Stat(uploadPath); errors.Is(err, os.ErrNotExist) {
-	    if err := os.Mkdir(uploadPath, os.ModePerm); err != nil {
+	    if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
 		log.Fatal(err)
 	    }
 	}
