@@ -13,5 +13,9 @@
   },
   "Template": {
     "BaseTemplateName": "templates/base.html"
+  },
+  "Upload": {
+      "UploadDirectoryName": "goweb-uploads/",
+      "MaxUploadSize": 10485760
   }
 }

@@ -1,5 +1,25 @@
 {{ define "pageTitle" }}Home{{ end }}
 
+{{ define "file-upload" }}
+<form
+	enctype="multipart/form-data"
+	action="/upload-handle"
+	method="post"
+	>
+	<input type="file" accept="*/*" name="file" />
+	<input type="submit" value="upload" />
+</form>
+{{ end }}
+
 {{ define "content" }}
 {{ .Test }}
+
+<!-- Uncomment below to demo file upload system -->
+
+<!-- {{ template "file-upload" . }} -->
+<!-- <p>Upload an image called test.jpg to test the file upload system</p> -->
+<!-- <img src="/uploads?name=test.jpg" alt=""> -->
+{{ end }}
+
+{{ define "content" }}
 {{ end }}

@@ -8,6 +8,7 @@ import (
 	"GoWeb/routes"
 	"context"
 	"embed"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -42,6 +43,14 @@ func main() {
 	// Create log file and set output
 	file, err := os.OpenFile("logs/"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	log.SetOutput(file)
+
+	// Create upload directory if it doesn't exist
+	uploadPath := appLoaded.Config.Upload.BaseName
+	if _, err := os.Stat(uploadPath); errors.Is(err, os.ErrNotExist) {
+		if err := os.MkdirAll(uploadPath, os.ModePerm); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	// Connect to database and run migrations
 	appLoaded.Db = database.ConnectDB(&appLoaded)

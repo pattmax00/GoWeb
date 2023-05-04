@@ -61,6 +61,13 @@ func (getController *GetController) ShowLogin(w http.ResponseWriter, r *http.Req
 	templating.RenderTemplate(getController.App, w, "templates/pages/login.html", data)
 }
 
+func (getController *GetController) ShowFile(w http.ResponseWriter, r *http.Request) {
+	// GET /uploads?name=file.jpg
+	// will serve file.jpg
+	name := r.URL.Query().Get("name")
+	http.ServeFile(w, r, getController.App.Config.Upload.BaseName+name)
+}
+
 func (getController *GetController) Logout(w http.ResponseWriter, r *http.Request) {
 	models.LogoutUser(getController.App, w, r)
 	http.Redirect(w, r, "/", http.StatusFound)
