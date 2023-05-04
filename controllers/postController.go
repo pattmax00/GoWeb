@@ -4,8 +4,9 @@ import (
 	"GoWeb/app"
 	"GoWeb/models"
 	"GoWeb/security"
-	"io/ioutil"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
@@ -73,12 +74,14 @@ func (postController *PostController) Register(w http.ResponseWriter, r *http.Re
 }
 
 func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.Request) {
-
 	max := postController.App.Config.Upload.MaxSize
-	r.ParseMultipartForm(max)
+	err := r.ParseMultipartForm(max)
+	if err != nil {
+		return
+	}
 
 	// FormFile returns the first file for the given key `file`
-	// it also returns the FileHeader so we can get the Filename,
+	// it also returns the FileHeader, so we can get the Filename,
 	// the Header and the size of the file
 	file, handler, err := r.FormFile("file")
 	if err != nil {
@@ -86,7 +89,12 @@ func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.
 		log.Println(err)
 		return
 	}
-	defer file.Close()
+	defer func(file multipart.File) {
+		err := file.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(file)
 
 	if handler.Size > max {
 		log.Println("User tried uploading a file which is too large.")
@@ -100,17 +108,24 @@ func (postController *PostController) FileUpload(w http.ResponseWriter, r *http.
 		log.Println(err)
 		http.Redirect(w, r, "/", http.StatusNotAcceptable)
 	}
-	defer tempFile.Close()
+	defer func(tempFile *os.File) {
+		err := tempFile.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(tempFile)
 
-	// read all of the contents of our uploaded file into a
+	// read all the contents of our uploaded file into a
 	// byte array
-	fileBytes, err := ioutil.ReadAll(file)
+	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		log.Println(err)
 	}
-	// write this byte array to our temporary file
-	tempFile.Write(fileBytes)
-	// return that we have successfully uploaded our file!
+
+	_, err = tempFile.Write(fileBytes)
+	if err != nil {
+		log.Println(err)
+	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }
