@@ -15,6 +15,6 @@ func PostRoutes(app *app.App) {
 	}
 
 	// User authentication
-	http.HandleFunc("/register-handle", middleware.CsrfMiddleware(postController.Register))
-	http.HandleFunc("/login-handle", middleware.CsrfMiddleware(postController.Login))
+	http.HandleFunc("/register-handle", middleware.Csrf(postController.Register))
+	http.HandleFunc("/login-handle", middleware.Csrf(postController.Login))
 }
