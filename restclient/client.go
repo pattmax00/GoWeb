@@ -15,7 +15,8 @@ func SendRequest(url string, method string, headers map[string]string, body inte
 	var contentType string
 
 	switch v := body.(type) {
-	case nil: // Leave nil for GET requests
+	case nil:
+		reqBody = bytes.NewBuffer([]byte(""))
 	case map[string]string:
 		reqBody = &bytes.Buffer{}
 		writer := multipart.NewWriter(reqBody)
