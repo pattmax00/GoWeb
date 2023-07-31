@@ -3,7 +3,6 @@ package controllers
 import (
 	"GoWeb/app"
 	"GoWeb/models"
-	"GoWeb/security"
 	"log"
 	"net/http"
 	"time"
@@ -15,13 +14,6 @@ type PostController struct {
 }
 
 func (postController *PostController) Login(w http.ResponseWriter, r *http.Request) {
-	// Validate csrf token
-	_, err := security.VerifyCsrfToken(r)
-	if err != nil {
-		log.Println("Error verifying csrf token")
-		return
-	}
-
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	remember := r.FormValue("remember") == "on"
@@ -31,7 +23,7 @@ func (postController *PostController) Login(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 
-	_, err = models.AuthenticateUser(postController.App, w, username, password, remember)
+	_, err := models.AuthenticateUser(postController.App, w, username, password, remember)
 	if err != nil {
 		log.Println("Error authenticating user")
 		log.Println(err)
@@ -43,13 +35,6 @@ func (postController *PostController) Login(w http.ResponseWriter, r *http.Reque
 }
 
 func (postController *PostController) Register(w http.ResponseWriter, r *http.Request) {
-	// Validate csrf token
-	_, err := security.VerifyCsrfToken(r)
-	if err != nil {
-		log.Println("Error verifying csrf token")
-		return
-	}
-
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	createdAt := time.Now()
@@ -60,7 +45,7 @@ func (postController *PostController) Register(w http.ResponseWriter, r *http.Re
 		http.Redirect(w, r, "/register", http.StatusFound)
 	}
 
-	_, err = models.CreateUser(postController.App, username, password, createdAt, updatedAt)
+	_, err := models.CreateUser(postController.App, username, password, createdAt, updatedAt)
 	if err != nil {
 		log.Println("Error creating user")
 		log.Println(err)

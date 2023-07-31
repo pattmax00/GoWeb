@@ -3,6 +3,7 @@ package routes
 import (
 	"GoWeb/app"
 	"GoWeb/controllers"
+	"GoWeb/middleware"
 	"net/http"
 )
 
@@ -14,6 +15,6 @@ func PostRoutes(app *app.App) {
 	}
 
 	// User authentication
-	http.HandleFunc("/register-handle", postController.Register)
-	http.HandleFunc("/login-handle", postController.Login)
+	http.HandleFunc("/register-handle", middleware.Csrf(postController.Register))
+	http.HandleFunc("/login-handle", middleware.Csrf(postController.Login))
 }
