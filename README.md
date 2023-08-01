@@ -12,7 +12,9 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 - Routing/controllers
 - Templating
 - Simple database migration system
+- Built in REST client
 - CSRF protection
+- Middleware
 - Minimal user login/registration + sessions
 - Config file handling
 - Scheduled tasks
