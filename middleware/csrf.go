@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// Csrf validates the CSRF token and returns the handler function if it succeded
+// Csrf validates the CSRF token and returns the handler function if it succeeded
 func Csrf(f func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, err := security.VerifyCsrfToken(r)
