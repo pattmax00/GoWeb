@@ -8,6 +8,7 @@ import (
 	"GoWeb/routes"
 	"context"
 	"embed"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -68,7 +69,7 @@ func main() {
 	go func() {
 		log.Println("Starting server and listening on " + appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port)
 		err := server.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Could not listen on %s: %v\n", appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, err)
 		}
 	}()
