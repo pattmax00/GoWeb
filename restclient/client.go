@@ -21,9 +21,17 @@ func SendRequest(url string, method string, headers map[string]string, body inte
 		reqBody = &bytes.Buffer{}
 		writer := multipart.NewWriter(reqBody)
 		for key, value := range v {
-			writer.WriteField(key, value)
+			err := writer.WriteField(key, value)
+			if err != nil {
+				return http.Response{}, err
+			}
 		}
-		writer.Close()
+
+		err := writer.Close()
+		if err != nil {
+			return http.Response{}, err
+		}
+
 		contentType = writer.FormDataContentType()
 	default:
 		jsonBody, err := json.Marshal(body)
