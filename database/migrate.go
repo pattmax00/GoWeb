@@ -36,7 +36,6 @@ func Migrate(app *app.App, anyStruct interface{}) error {
 
 // createTable creates a table with the given name if it doesn't exist, it is assumed that id will be the primary key
 func createTable(app *app.App, tableName string) error {
-	// Check to see if the table already exists
 	var tableExists bool
 	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relname ~ $1 AND pg_catalog.pg_table_is_visible(c.oid))", "^"+tableName+"$").Scan(&tableExists)
 	if err != nil {
@@ -63,7 +62,6 @@ func createTable(app *app.App, tableName string) error {
 
 // createColumn creates a column with the given name and type if it doesn't exist
 func createColumn(app *app.App, tableName, columnName, columnType string) error {
-	// Check to see if the column already exists
 	var columnExists bool
 	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = $2)", tableName, columnName).Scan(&columnExists)
 	if err != nil {

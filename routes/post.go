@@ -7,10 +7,10 @@ import (
 	"net/http"
 )
 
-// PostRoutes defines all project post routes
-func PostRoutes(app *app.App) {
+// Post defines all project post routes
+func Post(app *app.App) {
 	// Post controller struct initialize
-	postController := controllers.PostController{
+	postController := controllers.Post{
 		App: app,
 	}
 

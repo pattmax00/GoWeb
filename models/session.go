@@ -78,14 +78,12 @@ func GetSessionByAuthToken(app *app.App, authToken string) (Session, error) {
 
 // Generates a random 64-byte string
 func generateAuthToken(app *app.App) string {
-	// Generate random bytes
 	b := make([]byte, 64)
 	_, err := rand.Read(b)
 	if err != nil {
 		log.Println("Error generating random bytes")
 	}
 
-	// Convert random bytes to hex string
 	return hex.EncodeToString(b)
 }
 
@@ -129,7 +127,6 @@ func deleteSessionCookie(app *app.App, w http.ResponseWriter) {
 
 // DeleteSessionByAuthToken deletes a session from the database by AuthToken
 func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken string) error {
-	// Delete session from database
 	_, err := app.Db.Exec(deleteSessionByAuthToken, authToken)
 	if err != nil {
 		log.Println("Error deleting session from database")

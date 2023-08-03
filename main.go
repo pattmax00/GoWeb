@@ -44,7 +44,7 @@ func main() {
 	log.SetOutput(file)
 
 	// Connect to database and run migrations
-	appLoaded.Db = database.ConnectDB(&appLoaded)
+	appLoaded.Db = database.Connect(&appLoaded)
 	if appLoaded.Config.Db.AutoMigrate {
 		err = models.RunAllMigrations(&appLoaded)
 		if err != nil {
@@ -60,8 +60,8 @@ func main() {
 	}
 
 	// Define Routes
-	routes.GetRoutes(&appLoaded)
-	routes.PostRoutes(&appLoaded)
+	routes.Get(&appLoaded)
+	routes.Post(&appLoaded)
 
 	// Start server
 	server := &http.Server{Addr: appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port}

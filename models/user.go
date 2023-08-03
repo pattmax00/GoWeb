@@ -49,7 +49,6 @@ func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 func GetUserById(app *app.App, id int64) (User, error) {
 	user := User{}
 
-	// Query row by id
 	err := app.Db.QueryRow(selectUserById, id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Get user error (user not found) for user id:" + strconv.FormatInt(id, 10))
@@ -63,7 +62,6 @@ func GetUserById(app *app.App, id int64) (User, error) {
 func GetUserByUsername(app *app.App, username string) (User, error) {
 	user := User{}
 
-	// Query row by username
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Get user error (user not found) for user:" + username)
@@ -75,7 +73,6 @@ func GetUserByUsername(app *app.App, username string) (User, error) {
 
 // CreateUser creates a User table row in the database
 func CreateUser(app *app.App, username string, password string, createdAt time.Time, updatedAt time.Time) (User, error) {
-	// Hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println("Error hashing password when creating user")
@@ -97,14 +94,12 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, password string, remember bool) (Session, error) {
 	var user User
 
-	// Query row by username
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		log.Println("Authentication error (user not found) for user:" + username)
 		return Session{}, err
 	}
 
-	// Validate password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil { // Failed to validate password, doesn't match
 		log.Println("Authentication error (incorrect password) for user:" + username)
@@ -116,14 +111,12 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 
 // LogoutUser deletes the session cookie and AuthToken from the database
 func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
-	// Get cookie from request
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		log.Println("Error getting cookie from request")
 		return
 	}
 
-	// Set token to empty string
 	err = DeleteSessionByAuthToken(app, w, cookie.Value)
 	if err != nil {
 		log.Println("Error deleting session by AuthToken")

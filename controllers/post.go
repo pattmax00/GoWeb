@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-// PostController is a wrapper struct for the App struct
-type PostController struct {
+// Post is a wrapper struct for the App struct
+type Post struct {
 	App *app.App
 }
 
-func (postController *PostController) Login(w http.ResponseWriter, r *http.Request) {
+func (p *Post) Login(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	remember := r.FormValue("remember") == "on"
@@ -23,7 +23,7 @@ func (postController *PostController) Login(w http.ResponseWriter, r *http.Reque
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 
-	_, err := models.AuthenticateUser(postController.App, w, username, password, remember)
+	_, err := models.AuthenticateUser(p.App, w, username, password, remember)
 	if err != nil {
 		log.Println("Error authenticating user")
 		log.Println(err)
@@ -34,7 +34,7 @@ func (postController *PostController) Login(w http.ResponseWriter, r *http.Reque
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func (postController *PostController) Register(w http.ResponseWriter, r *http.Request) {
+func (p *Post) Register(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	createdAt := time.Now()
@@ -45,7 +45,7 @@ func (postController *PostController) Register(w http.ResponseWriter, r *http.Re
 		http.Redirect(w, r, "/register", http.StatusFound)
 	}
 
-	_, err := models.CreateUser(postController.App, username, password, createdAt, updatedAt)
+	_, err := models.CreateUser(p.App, username, password, createdAt, updatedAt)
 	if err != nil {
 		log.Println("Error creating user")
 		log.Println(err)

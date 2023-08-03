@@ -43,7 +43,6 @@ func LoadConfig() Configuration {
 		}
 	}(file)
 
-	// Decode json config file to Configuration struct named config
 	decoder := json.NewDecoder(file)
 	Config := Configuration{}
 	err = decoder.Decode(&Config)

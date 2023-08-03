@@ -8,10 +8,10 @@ import (
 	"net/http"
 )
 
-// GetRoutes defines all project get routes
-func GetRoutes(app *app.App) {
+// Get defines all project get routes
+func Get(app *app.App) {
 	// Get controller struct initialize
-	getController := controllers.GetController{
+	getController := controllers.Get{
 		App: app,
 	}
 

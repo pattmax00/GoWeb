@@ -22,7 +22,6 @@ type Task struct {
 }
 
 func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
-	// Run every time the server starts
 	for _, f := range app.ScheduledTasks.EveryReboot {
 		f(app)
 	}
@@ -37,7 +36,6 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 		{Interval: 365 * 24 * time.Hour, Funcs: app.ScheduledTasks.EveryYear},
 	}
 
-	// Set up task runners
 	var wg sync.WaitGroup
 	runners := make([]chan bool, len(tasks))
 	for i, task := range tasks {
@@ -65,10 +63,8 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 		}(task, runner)
 	}
 
-	// Wait for all goroutines to finish
 	wg.Wait()
 
-	// Close channels
 	for _, runner := range runners {
 		close(runner)
 	}

@@ -8,8 +8,8 @@ import (
 	"log"
 )
 
-// ConnectDB returns a new database connection
-func ConnectDB(app *app.App) *sql.DB {
+// Connect returns a new database connection
+func Connect(app *app.App) *sql.DB {
 	// Set connection parameters from config
 	postgresConfig := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",

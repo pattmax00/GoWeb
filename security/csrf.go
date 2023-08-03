@@ -10,7 +10,6 @@ import (
 
 // GenerateCsrfToken generates a csrf token and assigns it to a cookie for double submit cookie csrf protection
 func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
-	// Generate random 64 character string (alpha-numeric)
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
 	_, err := rand.Read(buff)
 	if err != nil {
