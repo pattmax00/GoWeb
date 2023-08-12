@@ -53,7 +53,6 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 		return CreateSession(app, w, userId, remember)
 	}
 
-	// Insert session into database
 	err = app.Db.QueryRow(insertSession, session.UserId, session.AuthToken, session.RememberMe, session.CreatedAt).Scan(&session.Id)
 	if err != nil {
 		log.Println("Error inserting session into database")
@@ -76,7 +75,7 @@ func GetSessionByAuthToken(app *app.App, authToken string) (Session, error) {
 	return session, nil
 }
 
-// Generates a random 64-byte string
+// generateAuthToken generates a random 64-byte string
 func generateAuthToken(app *app.App) string {
 	b := make([]byte, 64)
 	_, err := rand.Read(b)
