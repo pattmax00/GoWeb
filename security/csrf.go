@@ -13,7 +13,7 @@ func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
 	_, err := rand.Read(buff)
 	if err != nil {
-		slog.Error("Error creating random buffer for csrf token value" + err.Error())
+		slog.Error("error creating random buffer for csrf token value" + err.Error())
 		return "", err
 	}
 	str := hex.EncodeToString(buff)
@@ -37,7 +37,7 @@ func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
 func VerifyCsrfToken(r *http.Request) (bool, error) {
 	cookie, err := r.Cookie("csrf_token")
 	if err != nil {
-		slog.Info("Unable to get csrf_token cookie" + err.Error())
+		slog.Info("unable to get csrf_token cookie" + err.Error())
 		return false, err
 	}
 

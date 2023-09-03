@@ -34,14 +34,14 @@ func main() {
 	if _, err := os.Stat("logs"); os.IsNotExist(err) {
 		err := os.Mkdir("logs", 0755)
 		if err != nil {
-			panic("Failed to create log directory: " + err.Error())
+			panic("failed to create log directory: " + err.Error())
 		}
 	}
 
 	// Create log file and set output
 	file, err := os.OpenFile("logs/"+time.Now().Format("2006-01-02")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		panic("Error creating log file: " + err.Error())
+		panic("error creating log file: " + err.Error())
 	}
 
 	logger := slog.New(slog.NewTextHandler(file, nil))
@@ -70,10 +70,10 @@ func main() {
 	// Start server
 	server := &http.Server{Addr: appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port}
 	go func() {
-		slog.Info("Starting server and listening on " + appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port)
+		slog.Info("starting server and listening on " + appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port)
 		err := server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("Could not listen on %s: %v\n", appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, err)
+			slog.Error("could not listen on %s: %v\n", appLoaded.Config.Listen.Ip+":"+appLoaded.Config.Listen.Port, err)
 			os.Exit(1)
 		}
 	}()
@@ -85,11 +85,11 @@ func main() {
 	go app.RunScheduledTasks(&appLoaded, 100, stop)
 
 	<-interrupt
-	slog.Info("Interrupt signal received. Shutting down server...")
+	slog.Info("interrupt signal received. Shutting down server...")
 
 	err = server.Shutdown(context.Background())
 	if err != nil {
-		slog.Error("Could not gracefully shutdown the server: %v\n", err)
+		slog.Error("could not gracefully shutdown the server: %v\n", err)
 		os.Exit(1)
 	}
 }

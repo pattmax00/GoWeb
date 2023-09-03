@@ -24,7 +24,7 @@ func Connect(app *app.App) *sql.DB {
 		panic(err)
 	}
 
-	slog.Info("Connected to database successfully on " + app.Config.Db.Ip + ":" + app.Config.Db.Port + " using database " + app.Config.Db.Name)
+	slog.Info("connected to database successfully on " + app.Config.Db.Ip + ":" + app.Config.Db.Port + " using database " + app.Config.Db.Name)
 
 	return db
 }

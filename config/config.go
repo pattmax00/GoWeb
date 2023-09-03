@@ -33,13 +33,13 @@ func LoadConfig() Configuration {
 	flag.Parse()
 	file, err := os.Open(*c)
 	if err != nil {
-		panic("Unable to open JSON config file: " + err.Error())
+		panic("unable to open JSON config file: " + err.Error())
 	}
 
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			slog.Error("Unable to close JSON config file: ", err)
+			slog.Error("unable to close JSON config file: ", err)
 		}
 	}(file)
 
@@ -47,7 +47,7 @@ func LoadConfig() Configuration {
 	Config := Configuration{}
 	err = decoder.Decode(&Config)
 	if err != nil {
-		panic("Unable to decode JSON config file: " + err.Error())
+		panic("unable to decode JSON config file: " + err.Error())
 	}
 
 	return Config
