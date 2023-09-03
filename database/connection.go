@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"log"
+	"log/slog"
 )
 
 // Connect returns a new database connection
@@ -24,7 +24,7 @@ func Connect(app *app.App) *sql.DB {
 		panic(err)
 	}
 
-	log.Println("Connected to database successfully on " + app.Config.Db.Ip + ":" + app.Config.Db.Port + " using database " + app.Config.Db.Name)
+	slog.Info("Connected to database successfully on " + app.Config.Db.Ip + ":" + app.Config.Db.Port + " using database " + app.Config.Db.Name)
 
 	return db
 }

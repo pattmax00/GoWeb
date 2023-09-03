@@ -3,7 +3,7 @@ package controllers
 import (
 	"GoWeb/app"
 	"GoWeb/models"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -19,15 +19,12 @@ func (p *Post) Login(w http.ResponseWriter, r *http.Request) {
 	remember := r.FormValue("remember") == "on"
 
 	if username == "" || password == "" {
-		log.Println("Tried to login user with empty username or password")
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusUnauthorized)
 	}
 
 	_, err := models.AuthenticateUser(p.App, w, username, password, remember)
 	if err != nil {
-		log.Println("Error authenticating user")
-		log.Println(err)
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Redirect(w, r, "/login", http.StatusUnauthorized)
 		return
 	}
 
@@ -41,15 +38,14 @@ func (p *Post) Register(w http.ResponseWriter, r *http.Request) {
 	updatedAt := time.Now()
 
 	if username == "" || password == "" {
-		log.Println("Tried to create user with empty username or password")
-		http.Redirect(w, r, "/register", http.StatusFound)
+		http.Redirect(w, r, "/register", http.StatusUnauthorized)
 	}
 
 	_, err := models.CreateUser(p.App, username, password, createdAt, updatedAt)
 	if err != nil {
-		log.Println("Error creating user")
-		log.Println(err)
-		return
+		// TODO: if err == bcrypt.ErrPasswordTooLong display error to user, this will require a flash message system with cookies
+		slog.Error("error creating user: " + err.Error())
+		http.Redirect(w, r, "/register", http.StatusInternalServerError)
 	}
 
 	http.Redirect(w, r, "/login", http.StatusFound)

@@ -4,7 +4,7 @@ import (
 	"GoWeb/app"
 	"crypto/rand"
 	"encoding/hex"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -42,20 +42,19 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 	var existingAuthToken bool
 	err := app.Db.QueryRow(selectAuthTokenIfExists, session.AuthToken).Scan(&existingAuthToken)
 	if err != nil {
-		log.Println("Error checking for existing auth token")
-		log.Println(err)
+		slog.Error("error checking for existing auth token" + err.Error())
 		return Session{}, err
 	}
 
 	// If duplicate token found, recursively call function until unique token is generated
 	if existingAuthToken == true {
-		log.Println("Duplicate token found in sessions table, generating new token...")
+		slog.Warn("duplicate token found in sessions table, generating new token...")
 		return CreateSession(app, w, userId, remember)
 	}
 
 	err = app.Db.QueryRow(insertSession, session.UserId, session.AuthToken, session.RememberMe, session.CreatedAt).Scan(&session.Id)
 	if err != nil {
-		log.Println("Error inserting session into database")
+		slog.Error("error inserting session into database")
 		return Session{}, err
 	}
 
@@ -68,7 +67,6 @@ func GetSessionByAuthToken(app *app.App, authToken string) (Session, error) {
 
 	err := app.Db.QueryRow(selectSessionByAuthToken, authToken).Scan(&session.Id, &session.UserId, &session.AuthToken, &session.RememberMe, &session.CreatedAt)
 	if err != nil {
-		log.Println("Error getting session by auth token")
 		return Session{}, err
 	}
 
@@ -80,7 +78,7 @@ func generateAuthToken(app *app.App) string {
 	b := make([]byte, 64)
 	_, err := rand.Read(b)
 	if err != nil {
-		log.Println("Error generating random bytes")
+		slog.Error("error generating random bytes for auth token")
 	}
 
 	return hex.EncodeToString(b)
@@ -128,7 +126,7 @@ func deleteSessionCookie(app *app.App, w http.ResponseWriter) {
 func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken string) error {
 	_, err := app.Db.Exec(deleteSessionByAuthToken, authToken)
 	if err != nil {
-		log.Println("Error deleting session from database")
+		slog.Error("error deleting session from database")
 		return err
 	}
 
@@ -142,16 +140,14 @@ func ScheduledSessionCleanup(app *app.App) {
 	// Delete sessions older than 30 days (remember me sessions)
 	_, err := app.Db.Exec(deleteSessionsOlderThan30Days)
 	if err != nil {
-		log.Println("Error deleting 30 day expired sessions from database")
-		log.Println(err)
+		slog.Error("error deleting 30 day expired sessions from database" + err.Error())
 	}
 
 	// Delete sessions older than 6 hours
 	_, err = app.Db.Exec(deleteSessionsOlderThan6Hours)
 	if err != nil {
-		log.Println("Error deleting 6 hour expired sessions from database")
-		log.Println(err)
+		slog.Error("error deleting 6 hour expired sessions from database" + err.Error())
 	}
 
-	log.Println("Deleted expired sessions from database")
+	slog.Info("deleted expired sessions from database")
 }

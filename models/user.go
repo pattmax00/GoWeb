@@ -2,9 +2,8 @@ package models
 
 import (
 	"GoWeb/app"
-	"log"
+	"log/slog"
 	"net/http"
-	"strconv"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -32,13 +31,11 @@ const (
 func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
-		log.Println("Error getting session cookie")
 		return User{}, err
 	}
 
 	session, err := GetSessionByAuthToken(app, cookie.Value)
 	if err != nil {
-		log.Println("Error getting session by auth token")
 		return User{}, err
 	}
 
@@ -51,7 +48,6 @@ func GetUserById(app *app.App, id int64) (User, error) {
 
 	err := app.Db.QueryRow(selectUserById, id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		log.Println("Get user error (user not found) for user id:" + strconv.FormatInt(id, 10))
 		return User{}, err
 	}
 
@@ -64,7 +60,6 @@ func GetUserByUsername(app *app.App, username string) (User, error) {
 
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		log.Println("Get user error (user not found) for user:" + username)
 		return User{}, err
 	}
 
@@ -75,7 +70,7 @@ func GetUserByUsername(app *app.App, username string) (User, error) {
 func CreateUser(app *app.App, username string, password string, createdAt time.Time, updatedAt time.Time) (User, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println("Error hashing password when creating user")
+		slog.Error("error hashing password: " + err.Error())
 		return User{}, err
 	}
 
@@ -83,7 +78,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 
 	err = app.Db.QueryRow(insertUser, username, string(hash), createdAt, updatedAt).Scan(&lastInsertId)
 	if err != nil {
-		log.Println("Error creating user row")
+		slog.Error("error creating user row: " + err.Error())
 		return User{}, err
 	}
 
@@ -96,13 +91,13 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
-		log.Println("Authentication error (user not found) for user:" + username)
+		slog.Info("user not found: " + username)
 		return Session{}, err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil { // Failed to validate password, doesn't match
-		log.Println("Authentication error (incorrect password) for user:" + username)
+		slog.Info("incorrect password:" + username)
 		return Session{}, err
 	} else {
 		return CreateSession(app, w, user.Id, remember)
@@ -113,13 +108,11 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
-		log.Println("Error getting cookie from request")
 		return
 	}
 
 	err = DeleteSessionByAuthToken(app, w, cookie.Value)
 	if err != nil {
-		log.Println("Error deleting session by AuthToken")
 		return
 	}
 }

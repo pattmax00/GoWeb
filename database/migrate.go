@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lib/pq"
-	"log"
+	"log/slog"
 	"reflect"
 )
 
@@ -39,23 +39,23 @@ func createTable(app *app.App, tableName string) error {
 	var tableExists bool
 	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relname ~ $1 AND pg_catalog.pg_table_is_visible(c.oid))", "^"+tableName+"$").Scan(&tableExists)
 	if err != nil {
-		log.Println("Error checking if table exists: " + tableName)
+		slog.Error("Error checking if table exists: " + tableName)
 		return err
 	}
 
 	if tableExists {
-		log.Println("Table already exists: " + tableName)
+		slog.Info("Table already exists: " + tableName)
 		return nil
 	} else {
 		sanitizedTableQuery := fmt.Sprintf("CREATE TABLE IF NOT EXISTS \"%s\" (\"Id\" serial primary key)", tableName)
 
 		_, err := app.Db.Query(sanitizedTableQuery)
 		if err != nil {
-			log.Println("Error creating table: " + tableName)
+			slog.Error("Error creating table: " + tableName)
 			return err
 		}
 
-		log.Println("Table created successfully: " + tableName)
+		slog.Info("Table created successfully: " + tableName)
 		return nil
 	}
 }
@@ -65,17 +65,17 @@ func createColumn(app *app.App, tableName, columnName, columnType string) error 
 	var columnExists bool
 	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = $2)", tableName, columnName).Scan(&columnExists)
 	if err != nil {
-		log.Println("Error checking if column exists: " + columnName + " in table: " + tableName)
+		slog.Error("Error checking if column exists: " + columnName + " in table: " + tableName)
 		return err
 	}
 
 	if columnExists {
-		log.Println("Column already exists: " + columnName + " in table: " + tableName)
+		slog.Info("Column already exists: " + columnName + " in table: " + tableName)
 		return nil
 	} else {
 		postgresType, err := getPostgresType(columnType)
 		if err != nil {
-			log.Println("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
+			slog.Error("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
 			return err
 		}
 
@@ -84,11 +84,11 @@ func createColumn(app *app.App, tableName, columnName, columnType string) error 
 
 		_, err = app.Db.Query(query)
 		if err != nil {
-			log.Println("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
+			slog.Error("Error creating column: " + columnName + " in table: " + tableName + " with type: " + postgresType)
 			return err
 		}
 
-		log.Println("Column created successfully:", columnName)
+		slog.Info("Column created successfully:", columnName)
 
 		return nil
 	}

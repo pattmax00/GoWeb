@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"GoWeb/security"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -11,7 +11,7 @@ func Csrf(f func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWr
 	return func(w http.ResponseWriter, r *http.Request) {
 		_, err := security.VerifyCsrfToken(r)
 		if err != nil {
-			log.Println("Error verifying csrf token")
+			slog.Info("error verifying csrf token")
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}

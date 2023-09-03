@@ -3,7 +3,7 @@ package security
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"log"
+	"log/slog"
 	"math"
 	"net/http"
 )
@@ -13,8 +13,7 @@ func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
 	buff := make([]byte, int(math.Ceil(float64(64)/2)))
 	_, err := rand.Read(buff)
 	if err != nil {
-		log.Println("Error creating random buffer for csrf token value")
-		log.Println(err)
+		slog.Error("Error creating random buffer for csrf token value" + err.Error())
 		return "", err
 	}
 	str := hex.EncodeToString(buff)
@@ -38,8 +37,7 @@ func GenerateCsrfToken(w http.ResponseWriter, _ *http.Request) (string, error) {
 func VerifyCsrfToken(r *http.Request) (bool, error) {
 	cookie, err := r.Cookie("csrf_token")
 	if err != nil {
-		log.Println("Error getting csrf_token cookie")
-		log.Println(err)
+		slog.Info("Unable to get csrf_token cookie" + err.Error())
 		return false, err
 	}
 

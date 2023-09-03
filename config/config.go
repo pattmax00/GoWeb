@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"flag"
-	"log"
+	"log/slog"
 	"os"
 )
 
@@ -33,13 +33,13 @@ func LoadConfig() Configuration {
 	flag.Parse()
 	file, err := os.Open(*c)
 	if err != nil {
-		log.Fatal("Unable to open JSON config file: ", err)
+		panic("Unable to open JSON config file: " + err.Error())
 	}
 
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Fatal("Unable to close JSON config file: ", err)
+			slog.Error("Unable to close JSON config file: ", err)
 		}
 	}(file)
 
@@ -47,7 +47,7 @@ func LoadConfig() Configuration {
 	Config := Configuration{}
 	err = decoder.Decode(&Config)
 	if err != nil {
-		log.Fatal("Unable to decode JSON config file: ", err)
+		panic("Unable to decode JSON config file: " + err.Error())
 	}
 
 	return Config

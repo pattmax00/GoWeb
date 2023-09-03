@@ -4,7 +4,7 @@ import (
 	"GoWeb/app"
 	"GoWeb/controllers"
 	"io/fs"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -18,12 +18,12 @@ func Get(app *app.App) {
 	// Serve static files
 	staticFS, err := fs.Sub(app.Res, "static")
 	if err != nil {
-		log.Println(err)
+		slog.Error(err.Error())
 		return
 	}
 	staticHandler := http.FileServer(http.FS(staticFS))
 	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
-	log.Println("Serving static files from embedded file system /static")
+	slog.Info("Serving static files from embedded file system /static")
 
 	// Pages
 	http.HandleFunc("/", getController.ShowHome)
