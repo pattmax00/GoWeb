@@ -39,10 +39,13 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 ## How to use 🤔
 
 1. Clone
-2. Run `go get` to install dependencies
-3. Copy env_example.json to env.json and fill in the values
-4. Run `go run main.go` to start the server
-5. Start building your app!
+2. Delete the git folder, so you can start tracking in your own repo
+3. Run `go get` to install dependencies
+4. Copy env_example.json to env.json and fill in the values
+5. Run `go run main.go` to start the server
+6. Rename the occurences of "GoWeb" to your app name
+7. Start building your app!
+8. When you see useful changes to GoWeb you'd like in your project copy them over
 
 ## How to contribute 👨‍💻
 
