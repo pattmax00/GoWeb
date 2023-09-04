@@ -1,9 +1,8 @@
 package config
 
 import (
-	"encoding/json"
 	"flag"
-	"log/slog"
+	"github.com/BurntSushi/toml"
 	"os"
 )
 
