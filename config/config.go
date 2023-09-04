@@ -1,53 +1,44 @@
 package config
 
 import (
-	"encoding/json"
+	"github.com/BurntSushi/toml"
 	"flag"
-	"log/slog"
 	"os"
 )
 
 type Configuration struct {
 	Db struct {
-		Ip          string `json:"DbIp"`
-		Port        string `json:"DbPort"`
-		Name        string `json:"DbName"`
-		User        string `json:"DbUser"`
-		Password    string `json:"DbPassword"`
-		AutoMigrate bool   `json:"DbAutoMigrate"`
+		Ip          string `toml:"DbIp"`
+		Port        string `toml:"DbPort"`
+		Name        string `toml:"DbName"`
+		User        string `toml:"DbUser"`
+		Password    string `toml:"DbPassword"`
+		AutoMigrate bool   `toml:"DbAutoMigrate"`
 	}
 
 	Listen struct {
-		Ip   string `json:"HttpIp"`
-		Port string `json:"HttpPort"`
+		Ip   string `toml:"HttpIp"`
+		Port string `toml:"HttpPort"`
 	}
 
 	Template struct {
-		BaseName string `json:"BaseTemplateName"`
+		BaseName string `toml:"BaseTemplateName"`
 	}
 }
 
 // LoadConfig loads and returns a configuration struct
 func LoadConfig() Configuration {
-	c := flag.String("c", "env.json", "Path to the json configuration file")
+	c := flag.String("c", "env.toml", "Path to the toml configuration file")
 	flag.Parse()
-	file, err := os.Open(*c)
+	file, err := os.ReadFile(*c)
 	if err != nil {
-		panic("unable to open JSON config file: " + err.Error())
+		panic("Unable to read TOML config file: " + err.Error())
 	}
 
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			slog.Error("unable to close JSON config file: ", err)
-		}
-	}(file)
-
-	decoder := json.NewDecoder(file)
-	Config := Configuration{}
-	err = decoder.Decode(&Config)
+	var Config Configuration
+	_, err = toml.Decode(string(file), &Config)
 	if err != nil {
-		panic("unable to decode JSON config file: " + err.Error())
+		panic("Unable to decode TOML config file: " + err.Error())
 	}
 
 	return Config
