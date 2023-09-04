@@ -18,7 +18,7 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 - Minimal user login/registration + sessions
 - Config file handling
 - Scheduled tasks
-- Entire website compiles into a single binary (~10mb) (excluding env.json)
+- Entire website compiles into a single binary (~10mb) (excluding env.toml)
 - Minimal dependencies (just standard library, postgres driver, and experimental package for bcrypt)
 
 <hr>
@@ -41,7 +41,7 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 1. Clone
 2. Delete the git folder, so you can start tracking in your own repo
 3. Run `go get` to install dependencies
-4. Copy env_example.json to env.json and fill in the values
+4. Copy env_example.toml to env.toml and fill in the values
 5. Run `go run main.go` to start the server
 6. Rename the occurences of "GoWeb" to your app name
 7. Start building your app!
