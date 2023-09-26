@@ -47,7 +47,7 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 	}
 
 	// If duplicate token found, recursively call function until unique token is generated
-	if existingAuthToken == true {
+	if existingAuthToken {
 		slog.Warn("duplicate token found in sessions table, generating new token...")
 		return CreateSession(app, w, userId, remember)
 	}
