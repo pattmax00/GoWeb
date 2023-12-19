@@ -2,6 +2,8 @@ package models
 
 import (
 	"GoWeb/app"
+	"crypto/sha256"
+	"encoding/hex"
 	"log/slog"
 	"net/http"
 	"time"
@@ -68,7 +70,12 @@ func UserByUsername(app *app.App, username string) (User, error) {
 
 // CreateUser creates a User table row in the database
 func CreateUser(app *app.App, username string, password string, createdAt time.Time, updatedAt time.Time) (User, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	// Get sha256 hash of password then get bcrypt hash to store
+	hash256 := sha256.New()
+	hash256.Write([]byte(password))
+	hashSum := hash256.Sum(nil)
+	hashString := hex.EncodeToString(hashSum)
+	hash, err := bcrypt.GenerateFromPassword([]byte(hashString), bcrypt.DefaultCost)
 	if err != nil {
 		slog.Error("error hashing password: " + err.Error())
 		return User{}, err
@@ -95,7 +102,12 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 		return Session{}, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	// Get sha256 hash of password then check bcrypt
+	hash256 := sha256.New()
+	hash256.Write([]byte(password))
+	hashSum := hash256.Sum(nil)
+	hashString := hex.EncodeToString(hashSum)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(hashString))
 	if err != nil { // Failed to validate password, doesn't match
 		slog.Info("incorrect password:" + username)
 		return Session{}, err
