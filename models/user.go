@@ -27,23 +27,23 @@ const (
 	insertUser           = "INSERT INTO " + userTable + " (" + userColumnsNoId + ") VALUES ($1, $2, $3, $4) RETURNING \"Id\""
 )
 
-// GetCurrentUser finds the currently logged-in user by session cookie
-func GetCurrentUser(app *app.App, r *http.Request) (User, error) {
+// CurrentUser finds the currently logged-in user by session cookie
+func CurrentUser(app *app.App, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		return User{}, err
 	}
 
-	session, err := GetSessionByAuthToken(app, cookie.Value)
+	session, err := SessionByAuthToken(app, cookie.Value)
 	if err != nil {
 		return User{}, err
 	}
 
-	return GetUserById(app, session.UserId)
+	return UserById(app, session.UserId)
 }
 
-// GetUserById finds a User table row in the database by id and returns a struct representing this row
-func GetUserById(app *app.App, id int64) (User, error) {
+// UserById finds a User table row in the database by id and returns a struct representing this row
+func UserById(app *app.App, id int64) (User, error) {
 	user := User{}
 
 	err := app.Db.QueryRow(selectUserById, id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
@@ -54,8 +54,8 @@ func GetUserById(app *app.App, id int64) (User, error) {
 	return user, nil
 }
 
-// GetUserByUsername finds a User table row in the database by username and returns a struct representing this row
-func GetUserByUsername(app *app.App, username string) (User, error) {
+// UserByUsername finds a User table row in the database by username and returns a struct representing this row
+func UserByUsername(app *app.App, username string) (User, error) {
 	user := User{}
 
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
@@ -82,7 +82,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 		return User{}, err
 	}
 
-	return GetUserById(app, lastInsertId)
+	return UserById(app, lastInsertId)
 }
 
 // AuthenticateUser validates the password for the specified user

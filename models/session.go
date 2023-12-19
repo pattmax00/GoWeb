@@ -62,7 +62,7 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 	return session, nil
 }
 
-func GetSessionByAuthToken(app *app.App, authToken string) (Session, error) {
+func SessionByAuthToken(app *app.App, authToken string) (Session, error) {
 	session := Session{}
 
 	err := app.Db.QueryRow(selectSessionByAuthToken, authToken).Scan(&session.Id, &session.UserId, &session.AuthToken, &session.RememberMe, &session.CreatedAt)
