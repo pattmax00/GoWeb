@@ -17,8 +17,8 @@ type Scheduled struct {
 }
 
 type Task struct {
-	Interval time.Duration
 	Funcs    []func(app *App)
+	Interval time.Duration
 }
 
 func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
@@ -27,13 +27,13 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 	}
 
 	tasks := []Task{
-		{Interval: time.Second, Funcs: app.ScheduledTasks.EverySecond},
-		{Interval: time.Minute, Funcs: app.ScheduledTasks.EveryMinute},
-		{Interval: time.Hour, Funcs: app.ScheduledTasks.EveryHour},
-		{Interval: 24 * time.Hour, Funcs: app.ScheduledTasks.EveryDay},
-		{Interval: 7 * 24 * time.Hour, Funcs: app.ScheduledTasks.EveryWeek},
-		{Interval: 30 * 24 * time.Hour, Funcs: app.ScheduledTasks.EveryMonth},
-		{Interval: 365 * 24 * time.Hour, Funcs: app.ScheduledTasks.EveryYear},
+		{Funcs: app.ScheduledTasks.EverySecond, Interval: time.Second},
+		{Funcs: app.ScheduledTasks.EveryMinute, Interval: time.Minute},
+		{Funcs: app.ScheduledTasks.EveryHour, Interval: time.Hour},
+		{Funcs: app.ScheduledTasks.EveryDay, Interval: 24 * time.Hour},
+		{Funcs: app.ScheduledTasks.EveryWeek, Interval: 7 * 24 * time.Hour},
+		{Funcs: app.ScheduledTasks.EveryMonth, Interval: 30 * 24 * time.Hour},
+		{Funcs: app.ScheduledTasks.EveryYear, Interval: 365 * 24 * time.Hour},
 	}
 
 	var wg sync.WaitGroup
