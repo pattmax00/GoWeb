@@ -6,6 +6,7 @@ import (
 	"GoWeb/database"
 	"GoWeb/models"
 	"GoWeb/routes"
+	"GoWeb/templating"
 	"context"
 	"embed"
 	"errors"
@@ -66,6 +67,13 @@ func main() {
 	// Define Routes
 	routes.Get(&appLoaded)
 	routes.Post(&appLoaded)
+
+	// Prepare templates
+	err = templating.BuildPages(&appLoaded)
+	if err != nil {
+		slog.Error("error building templates: " + err.Error())
+		os.Exit(1)
+	}
 
 	// Start server
 	server := &http.Server{Addr: appLoaded.Config.Listen.Ip + ":" + appLoaded.Config.Listen.Port}

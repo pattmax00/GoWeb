@@ -22,7 +22,7 @@ func (g *Get) ShowHome(w http.ResponseWriter, _ *http.Request) {
 		Test: "Hello World!",
 	}
 
-	templating.RenderTemplate(g.App, w, "templates/pages/home.html", data)
+	templating.RenderTemplate(w, "templates/pages/home.html", data)
 }
 
 func (g *Get) ShowRegister(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +39,7 @@ func (g *Get) ShowRegister(w http.ResponseWriter, r *http.Request) {
 		CsrfToken: CsrfToken,
 	}
 
-	templating.RenderTemplate(g.App, w, "templates/pages/register.html", data)
+	templating.RenderTemplate(w, "templates/pages/register.html", data)
 }
 
 func (g *Get) ShowLogin(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (g *Get) ShowLogin(w http.ResponseWriter, r *http.Request) {
 		CsrfToken: CsrfToken,
 	}
 
-	templating.RenderTemplate(g.App, w, "templates/pages/login.html", data)
+	templating.RenderTemplate(w, "templates/pages/login.html", data)
 }
 
 func (g *Get) Logout(w http.ResponseWriter, r *http.Request) {

@@ -23,7 +23,8 @@ type Configuration struct {
 	}
 
 	Template struct {
-		BaseName string `json:"BaseTemplateName"`
+		BaseName    string `json:"BaseTemplateName"`
+		ContentPath string `json:"ContentPath"`
 	}
 }
 

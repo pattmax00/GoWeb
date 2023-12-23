@@ -12,6 +12,7 @@
     "HttpPort": "8090"
   },
   "Template": {
-    "BaseTemplateName": "templates/base.html"
+    "BaseTemplateName": "templates/base.html",
+    "ContentPath": "templates"
   }
 }
