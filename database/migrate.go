@@ -9,7 +9,8 @@ import (
 	"reflect"
 )
 
-// Migrate given a dummy object of any type, it will create a table with the same name as the type and create columns with the same name as the fields of the object
+// Migrate given a dummy object of any type, it will create a table with the same name
+// as the type and create columns with the same name as the fields of the object
 func Migrate(app *app.App, anyStruct interface{}) error {
 	valueOfStruct := reflect.ValueOf(anyStruct)
 	typeOfStruct := valueOfStruct.Type()
@@ -23,10 +24,15 @@ func Migrate(app *app.App, anyStruct interface{}) error {
 	for i := 0; i < valueOfStruct.NumField(); i++ {
 		fieldType := typeOfStruct.Field(i)
 		fieldName := fieldType.Name
-		if fieldName != "Id" && fieldName != "id" {
-			err := createColumn(app, tableName, fieldName, fieldType.Type.Name())
-			if err != nil {
-				return err
+
+		// Create column if dummy for migration is NOT zero value
+		fieldValue := valueOfStruct.Field(i).Interface()
+		if !reflect.ValueOf(fieldValue).IsZero() {
+			if fieldName != "Id" && fieldName != "id" {
+				err := createColumn(app, tableName, fieldName, fieldType.Type.Name())
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
