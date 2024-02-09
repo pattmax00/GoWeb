@@ -17,7 +17,7 @@ type Session struct {
 	CreatedAt  time.Time
 }
 
-const sessionColumnsNoId = "\"UserId\", \"AuthToken\",\"RememberMe\", \"CreatedAt\""
+const sessionColumnsNoId = "\"UserId\", \"AuthToken\", \"RememberMe\", \"CreatedAt\""
 const sessionColumns = "\"Id\", " + sessionColumnsNoId
 const sessionTable = "public.\"Session\""
 
