@@ -15,6 +15,7 @@ func Post(app *app.App) {
 	}
 
 	// User authentication
-	http.HandleFunc("/register-handle", middleware.Csrf(postController.Register))
-	http.HandleFunc("/login-handle", middleware.Csrf(postController.Login))
+	http.HandleFunc("POST /register-handle", middleware.Csrf(postController.Register))
+	http.HandleFunc("POST /login-handle", middleware.Csrf(postController.Login))
+	http.HandleFunc("POST /logout", middleware.Csrf(postController.Logout))
 }

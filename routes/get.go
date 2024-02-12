@@ -26,8 +26,7 @@ func Get(app *app.App) {
 	slog.Info("serving static files from embedded file system /static")
 
 	// Pages
-	http.HandleFunc("/", getController.ShowHome)
-	http.HandleFunc("/login", getController.ShowLogin)
-	http.HandleFunc("/register", getController.ShowRegister)
-	http.HandleFunc("/logout", getController.Logout)
+	http.HandleFunc("GET /", getController.ShowHome)
+	http.HandleFunc("GET /login", getController.ShowLogin)
+	http.HandleFunc("GET /register", getController.ShowRegister)
 }

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"GoWeb/app"
-	"GoWeb/models"
 	"GoWeb/security"
 	"GoWeb/templating"
 	"net/http"
@@ -15,7 +14,8 @@ type Get struct {
 
 func (g *Get) ShowHome(w http.ResponseWriter, _ *http.Request) {
 	type dataStruct struct {
-		Test string
+		CsrfToken string
+		Test      string
 	}
 
 	data := dataStruct{
@@ -57,9 +57,4 @@ func (g *Get) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templating.RenderTemplate(w, "templates/pages/login.html", data)
-}
-
-func (g *Get) Logout(w http.ResponseWriter, r *http.Request) {
-	models.LogoutUser(g.App, w, r)
-	http.Redirect(w, r, "/", http.StatusFound)
 }

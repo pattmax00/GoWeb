@@ -50,3 +50,8 @@ func (p *Post) Register(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
+
+func (p *Post) Logout(w http.ResponseWriter, r *http.Request) {
+	models.LogoutUser(p.App, w, r)
+	http.Redirect(w, r, "/", http.StatusFound)
+}
