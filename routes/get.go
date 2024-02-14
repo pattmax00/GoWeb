@@ -22,7 +22,7 @@ func Get(app *app.App) {
 		return
 	}
 	staticHandler := http.FileServer(http.FS(staticFS))
-	http.Handle("/static/", http.StripPrefix("/static/", staticHandler))
+	http.Handle("GET /static/", http.StripPrefix("/static/", staticHandler))
 	slog.Info("serving static files from embedded file system /static")
 
 	// Pages
