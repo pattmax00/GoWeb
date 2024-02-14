@@ -25,7 +25,7 @@ func RunAllMigrations(app *app.App) error {
 		Id:         1,
 		UserId:     1,
 		AuthToken:  "migrate",
-		RememberMe: false,
+		RememberMe: true, // Booleans must be true to migrate properly
 		CreatedAt:  time.Now(),
 	}
 	err = database.Migrate(app, session)
