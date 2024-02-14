@@ -6,6 +6,21 @@
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 <body>
+<div class="navbar">
+    {{ if .IsAuthenticated }}
+    <form action="/logout" method="post">
+        <input name="csrf_token" type="hidden" value="{{ .CsrfToken }}">
+        <input type="submit" value="Logout">
+    </form>
+    {{ else }}
+    <form action="/login" method="get">
+        <input type="submit" value="Login">
+    </form>
+    <form action="/register" method="get">
+        <input type="submit" value="Register">
+    </form>
+    {{ end }}
+</div>
 {{ template "content" . }}
 <div class="footer-container">
     <footer>
