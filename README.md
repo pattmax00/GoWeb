@@ -19,7 +19,7 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 - Config file handling
 - Scheduled tasks
 - Entire website compiles into a single binary (~10mb) (excluding env.json)
-- Minimal dependencies (just standard library, postgres driver, and experimental package for bcrypt)
+- Minimal dependencies (just standard library, postgres driver, and x/crypto for bcrypt)
 
 <hr>
 
@@ -59,7 +59,7 @@ fine with getting your hands dirty, but I plan on having it ready to go for more
 ### License and disclaimer 😤
 
 - You are free to use this project under the terms of the MIT license. See LICENSE for more details.
-- You and you alone are responsible for the security and everything else regarding your application.
+- You are responsible for the security and everything else regarding your application.
 - It is not required, but I ask that when you use this project you give me credit by linking to this repository.
 - I also ask that when releasing self-hosted or other end-user applications that you release it under
   the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html) license. This too is not required, but I would appreciate it.
