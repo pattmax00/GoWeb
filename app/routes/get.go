@@ -2,14 +2,14 @@ package routes
 
 import (
 	"GoWeb/app"
-	"GoWeb/controllers"
+	"GoWeb/app/controllers"
 	"io/fs"
 	"log/slog"
 	"net/http"
 )
 
 // Get defines all project get routes
-func Get(app *app.App) {
+func Get(app *app.Deps) {
 	// Get controller struct initialize
 	getController := controllers.Get{
 		App: app,

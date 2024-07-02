@@ -2,6 +2,8 @@ package middleware
 
 import "net/http"
 
+type MiddlewareFunc func(f func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request)
+
 // ProcessGroup is a wrapper function for the http.HandleFunc function
 // that takes the function you want to execute (f) and the middleware you want
 // to execute (m) this should be used when processing multiple groups of middleware at a time

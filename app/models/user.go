@@ -30,7 +30,7 @@ const (
 )
 
 // CurrentUser finds the currently logged-in user by session cookie
-func CurrentUser(app *app.App, r *http.Request) (User, error) {
+func CurrentUser(app *app.Deps, r *http.Request) (User, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		return User{}, err
@@ -45,7 +45,7 @@ func CurrentUser(app *app.App, r *http.Request) (User, error) {
 }
 
 // UserById finds a User table row in the database by id and returns a struct representing this row
-func UserById(app *app.App, id int64) (User, error) {
+func UserById(app *app.Deps, id int64) (User, error) {
 	user := User{}
 
 	err := app.Db.QueryRow(selectUserById, id).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
@@ -57,7 +57,7 @@ func UserById(app *app.App, id int64) (User, error) {
 }
 
 // UserByUsername finds a User table row in the database by username and returns a struct representing this row
-func UserByUsername(app *app.App, username string) (User, error) {
+func UserByUsername(app *app.Deps, username string) (User, error) {
 	user := User{}
 
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
@@ -69,7 +69,7 @@ func UserByUsername(app *app.App, username string) (User, error) {
 }
 
 // CreateUser creates a User table row in the database
-func CreateUser(app *app.App, username string, password string, createdAt time.Time, updatedAt time.Time) (User, error) {
+func CreateUser(app *app.Deps, username string, password string, createdAt time.Time, updatedAt time.Time) (User, error) {
 	// Get sha256 hash of password then get bcrypt hash to store
 	hash256 := sha256.New()
 	hash256.Write([]byte(password))
@@ -93,7 +93,7 @@ func CreateUser(app *app.App, username string, password string, createdAt time.T
 }
 
 // AuthenticateUser validates the password for the specified user
-func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, password string, remember bool) (Session, error) {
+func AuthenticateUser(app *app.Deps, w http.ResponseWriter, username string, password string, remember bool) (Session, error) {
 	var user User
 
 	err := app.Db.QueryRow(selectUserByUsername, username).Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.UpdatedAt)
@@ -117,7 +117,7 @@ func AuthenticateUser(app *app.App, w http.ResponseWriter, username string, pass
 }
 
 // LogoutUser deletes the session cookie and AuthToken from the database
-func LogoutUser(app *app.App, w http.ResponseWriter, r *http.Request) {
+func LogoutUser(app *app.Deps, w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		return

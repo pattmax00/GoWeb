@@ -2,10 +2,10 @@ package main
 
 import (
 	"GoWeb/app"
+	"GoWeb/app/models"
+	"GoWeb/app/routes"
 	"GoWeb/config"
 	"GoWeb/database"
-	"GoWeb/models"
-	"GoWeb/routes"
 	"GoWeb/templating"
 	"context"
 	"embed"
@@ -18,12 +18,12 @@ import (
 	"time"
 )
 
-//go:embed templates static
+//go:embed app/frontend/templates app/frontend/static
 var res embed.FS
 
 func main() {
-	// Create instance of App
-	appLoaded := app.App{}
+	// Create instance of Deps
+	appLoaded := app.Deps{}
 
 	// Load config file to application
 	appLoaded.Config = config.LoadConfig()
@@ -60,8 +60,8 @@ func main() {
 
 	// Assign and run scheduled tasks
 	appLoaded.ScheduledTasks = app.Scheduled{
-		EveryReboot: []func(app *app.App){models.ScheduledSessionCleanup},
-		EveryMinute: []func(app *app.App){models.ScheduledSessionCleanup},
+		EveryReboot: []func(app *app.Deps){models.ScheduledSessionCleanup},
+		EveryMinute: []func(app *app.Deps){models.ScheduledSessionCleanup},
 	}
 
 	// Define Routes

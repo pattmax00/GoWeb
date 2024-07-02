@@ -9,9 +9,9 @@ import (
 	"net/http"
 )
 
-var templates = make(map[string]*template.Template) // This is only used here, does not need to be in app.App
+var templates = make(map[string]*template.Template) // This is only used here, does not need to be in app.Deps
 
-func BuildPages(app *app.App) error {
+func BuildPages(app *app.Deps) error {
 	basePath := app.Config.Template.BaseName
 
 	baseContent, err := app.Res.ReadFile(basePath)

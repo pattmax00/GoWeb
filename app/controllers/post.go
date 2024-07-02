@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"GoWeb/app"
-	"GoWeb/models"
+	"GoWeb/app/models"
 	"log/slog"
 	"net/http"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 // Post is a wrapper struct for the App struct
 type Post struct {
-	App *app.App
+	App *app.Deps
 }
 
 func (p *Post) Login(w http.ResponseWriter, r *http.Request) {

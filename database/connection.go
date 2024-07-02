@@ -9,7 +9,7 @@ import (
 )
 
 // Connect returns a new database connection
-func Connect(app *app.App) *sql.DB {
+func Connect(app *app.Deps) *sql.DB {
 	postgresConfig := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		app.Config.Db.Ip, app.Config.Db.Port, app.Config.Db.User, app.Config.Db.Password, app.Config.Db.Name)

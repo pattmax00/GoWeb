@@ -11,7 +11,7 @@ import (
 
 // Migrate given a dummy object of any type, it will create a table with the same name
 // as the type and create columns with the same name as the fields of the object
-func Migrate(app *app.App, anyStruct interface{}) error {
+func Migrate(app *app.Deps, anyStruct interface{}) error {
 	valueOfStruct := reflect.ValueOf(anyStruct)
 	typeOfStruct := valueOfStruct.Type()
 
@@ -41,7 +41,7 @@ func Migrate(app *app.App, anyStruct interface{}) error {
 }
 
 // createTable creates a table with the given name if it doesn't exist, it is assumed that id will be the primary key
-func createTable(app *app.App, tableName string) error {
+func createTable(app *app.Deps, tableName string) error {
 	var tableExists bool
 	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relname ~ $1 AND pg_catalog.pg_table_is_visible(c.oid))", "^"+tableName+"$").Scan(&tableExists)
 	if err != nil {
@@ -67,7 +67,7 @@ func createTable(app *app.App, tableName string) error {
 }
 
 // createColumn creates a column with the given name and type if it doesn't exist
-func createColumn(app *app.App, tableName, columnName, columnType string) error {
+func createColumn(app *app.Deps, tableName, columnName, columnType string) error {
 	var columnExists bool
 	err := app.Db.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = $2)", tableName, columnName).Scan(&columnExists)
 	if err != nil {

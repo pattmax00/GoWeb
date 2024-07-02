@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"GoWeb/app"
-	"GoWeb/models"
+	"GoWeb/app/models"
 	"GoWeb/security"
 	"GoWeb/templating"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 
 // Get is a wrapper struct for the App struct
 type Get struct {
-	App *app.App
+	App *app.Deps
 }
 
 func (g *Get) ShowHome(w http.ResponseWriter, _ *http.Request) {

@@ -31,7 +31,7 @@ const (
 )
 
 // CreateSession creates a new session for a user
-func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember bool) (Session, error) {
+func CreateSession(app *app.Deps, w http.ResponseWriter, userId int64, remember bool) (Session, error) {
 	session := Session{}
 	session.UserId = userId
 	session.AuthToken = generateAuthToken(app)
@@ -62,7 +62,7 @@ func CreateSession(app *app.App, w http.ResponseWriter, userId int64, remember b
 	return session, nil
 }
 
-func SessionByAuthToken(app *app.App, authToken string) (Session, error) {
+func SessionByAuthToken(app *app.Deps, authToken string) (Session, error) {
 	session := Session{}
 
 	err := app.Db.QueryRow(selectSessionByAuthToken, authToken).Scan(&session.Id, &session.UserId, &session.AuthToken, &session.RememberMe, &session.CreatedAt)
@@ -74,7 +74,7 @@ func SessionByAuthToken(app *app.App, authToken string) (Session, error) {
 }
 
 // generateAuthToken generates a random 64-byte string
-func generateAuthToken(app *app.App) string {
+func generateAuthToken(app *app.Deps) string {
 	b := make([]byte, 64)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -85,7 +85,7 @@ func generateAuthToken(app *app.App) string {
 }
 
 // createSessionCookie creates a new session cookie
-func createSessionCookie(app *app.App, w http.ResponseWriter, session Session) {
+func createSessionCookie(app *app.Deps, w http.ResponseWriter, session Session) {
 	cookie := &http.Cookie{}
 	if session.RememberMe {
 		cookie = &http.Cookie{
@@ -111,7 +111,7 @@ func createSessionCookie(app *app.App, w http.ResponseWriter, session Session) {
 }
 
 // deleteSessionCookie deletes the session cookie
-func deleteSessionCookie(app *app.App, w http.ResponseWriter) {
+func deleteSessionCookie(app *app.Deps, w http.ResponseWriter) {
 	cookie := &http.Cookie{
 		Name:   "session",
 		Value:  "",
@@ -123,7 +123,7 @@ func deleteSessionCookie(app *app.App, w http.ResponseWriter) {
 }
 
 // DeleteSessionByAuthToken deletes a session from the database by AuthToken
-func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken string) error {
+func DeleteSessionByAuthToken(app *app.Deps, w http.ResponseWriter, authToken string) error {
 	_, err := app.Db.Exec(deleteSessionByAuthToken, authToken)
 	if err != nil {
 		slog.Error("error deleting session from database")
@@ -136,7 +136,7 @@ func DeleteSessionByAuthToken(app *app.App, w http.ResponseWriter, authToken str
 }
 
 // ScheduledSessionCleanup deletes expired sessions from the database
-func ScheduledSessionCleanup(app *app.App) {
+func ScheduledSessionCleanup(app *app.Deps) {
 	// Delete sessions older than 30 days (remember me sessions)
 	_, err := app.Db.Exec(deleteSessionsOlderThan30Days)
 	if err != nil {

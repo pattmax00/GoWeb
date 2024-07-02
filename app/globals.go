@@ -6,8 +6,8 @@ import (
 	"embed"
 )
 
-// App contains and supplies available configurations and connections
-type App struct {
+// Deps contains and supplies available configurations and connections
+type Deps struct {
 	Config         config.Configuration // Configuration file
 	Db             *sql.DB              // Database connection
 	Res            *embed.FS            // Resources from the embedded filesystem

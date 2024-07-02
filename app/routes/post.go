@@ -2,13 +2,13 @@ package routes
 
 import (
 	"GoWeb/app"
-	"GoWeb/controllers"
-	"GoWeb/middleware"
+	"GoWeb/app/controllers"
+	"GoWeb/app/middleware"
 	"net/http"
 )
 
 // Post defines all project post routes
-func Post(app *app.App) {
+func Post(app *app.Deps) {
 	// Post controller struct initialize
 	postController := controllers.Post{
 		App: app,

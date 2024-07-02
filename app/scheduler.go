@@ -6,22 +6,22 @@ import (
 )
 
 type Scheduled struct {
-	EveryReboot []func(app *App)
-	EverySecond []func(app *App)
-	EveryMinute []func(app *App)
-	EveryHour   []func(app *App)
-	EveryDay    []func(app *App)
-	EveryWeek   []func(app *App)
-	EveryMonth  []func(app *App)
-	EveryYear   []func(app *App)
+	EveryReboot []func(app *Deps)
+	EverySecond []func(app *Deps)
+	EveryMinute []func(app *Deps)
+	EveryHour   []func(app *Deps)
+	EveryDay    []func(app *Deps)
+	EveryWeek   []func(app *Deps)
+	EveryMonth  []func(app *Deps)
+	EveryYear   []func(app *Deps)
 }
 
 type Task struct {
-	Funcs    []func(app *App)
+	Funcs    []func(app *Deps)
 	Interval time.Duration
 }
 
-func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
+func RunScheduledTasks(app *Deps, poolSize int, stop <-chan struct{}) {
 	for _, f := range app.ScheduledTasks.EveryReboot {
 		f(app)
 	}
@@ -51,7 +51,7 @@ func RunScheduledTasks(app *App, poolSize int, stop <-chan struct{}) {
 				case <-ticker.C:
 					for _, f := range task.Funcs {
 						runner <- true
-						go func(f func(app *App)) {
+						go func(f func(app *Deps)) {
 							defer func() { <-runner }()
 							f(app)
 						}(f)
