@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"GoWeb/app"
-	"GoWeb/app/models"
+	"GoWeb/internal"
+	"GoWeb/internal/models"
 	"GoWeb/security"
 	"GoWeb/templating"
 	"net/http"

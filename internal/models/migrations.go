@@ -1,8 +1,8 @@
 package models
 
 import (
-	"GoWeb/app"
 	"GoWeb/database"
+	"GoWeb/internal"
 	"time"
 )
 

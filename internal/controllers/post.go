@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"GoWeb/app"
-	"GoWeb/app/models"
+	"GoWeb/internal"
+	"GoWeb/internal/models"
 	"log/slog"
 	"net/http"
 	"time"

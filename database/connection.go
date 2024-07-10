@@ -1,7 +1,7 @@
 package database
 
 import (
-	"GoWeb/app"
+	"GoWeb/internal"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"

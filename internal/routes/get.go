@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"GoWeb/app"
-	"GoWeb/app/controllers"
+	"GoWeb/internal"
+	"GoWeb/internal/controllers"
 	"io/fs"
 	"log/slog"
 	"net/http"

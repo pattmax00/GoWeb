@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"GoWeb/app"
-	"GoWeb/app/controllers"
-	"GoWeb/app/middleware"
+	"GoWeb/internal"
+	"GoWeb/internal/controllers"
+	"GoWeb/internal/middleware"
 	"net/http"
 )
 

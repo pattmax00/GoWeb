@@ -1,11 +1,11 @@
 package main
 
 import (
-	"GoWeb/app"
-	"GoWeb/app/models"
-	"GoWeb/app/routes"
 	"GoWeb/config"
 	"GoWeb/database"
+	"GoWeb/internal"
+	"GoWeb/internal/models"
+	"GoWeb/internal/routes"
 	"GoWeb/templating"
 	"context"
 	"embed"
@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-//go:embed app/frontend/templates app/frontend/static
+//go:embed internal/frontend/templates internal/frontend/static
 var res embed.FS
 
 func main() {

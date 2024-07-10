@@ -1,7 +1,7 @@
 package templating
 
 import (
-	"GoWeb/app"
+	"GoWeb/internal"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-var templates = make(map[string]*template.Template) // This is only used here, does not need to be in app.Deps
+var templates = make(map[string]*template.Template) // This is only used here, does not need to be in internal.Deps
 
 func BuildPages(app *app.Deps) error {
 	basePath := app.Config.Template.BaseName

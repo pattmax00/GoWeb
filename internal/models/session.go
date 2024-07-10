@@ -1,7 +1,7 @@
 package models
 
 import (
-	"GoWeb/app"
+	"GoWeb/internal"
 	"crypto/rand"
 	"encoding/hex"
 	"log/slog"
